@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oberlin College — Campus Safety & Wellness Map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Playfair+Display:wght@700;800;900&display=swap');
+  :root {
+    --bg:#f6f4f0;--surface:#ffffff;--surface2:#f0ede8;--border:#ddd8d0;
+    --text:#1a1a1a;--text-dim:#7a756e;--accent:#c94040;--accent-glow:rgba(201,64,64,0.10);
+    --gold:#9e7c38;--green:#3a7a54;--blue:#3a6ba5;--purple:#7048a5;
+    --orange:#b07828;--teal:#2e9488;--pink:#c04878;--aed:#d03030;
+    --menstrual:#9c5fb5;--vending:#3a8a7a;
+    --radius:10px;--shadow-sm:0 2px 8px rgba(0,0,0,.06);--shadow-md:0 6px 24px rgba(0,0,0,.10);--shadow-lg:0 12px 40px rgba(0,0,0,.14);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;}
+
+  /* ===== SIDEBAR ===== */
+  .sidebar{width:360px;min-width:360px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:1000;position:relative;box-shadow:2px 0 20px rgba(0,0,0,.07);}
+  .sidebar-header{padding:22px 22px 16px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(158,124,56,.03) 0%,transparent 100%);}
+  .sidebar-header h1{font-family:'Playfair Display',serif;font-weight:900;font-size:21px;color:var(--gold);letter-spacing:-.02em;}
+  .sidebar-header p{font-size:12px;color:var(--text-dim);margin-top:3px;font-weight:400;}
+  .sidebar-header .subtitle{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap;}
+  .sidebar-header .subtitle .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;}
+  .badge-aed{background:var(--accent-glow);color:var(--aed);border:1px solid rgba(208,48,48,.2);}
+  .badge-wellness{background:rgba(156,95,181,.08);color:var(--menstrual);border:1px solid rgba(156,95,181,.2);}
+  .badge-safety{background:rgba(58,122,84,.08);color:var(--green);border:1px solid rgba(58,122,84,.2);}
+
+  /* Tabs */
+  .tab-row{display:flex;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--surface);}
+  .tab-btn{flex:1 1 33.33%;min-width:0;padding:10px 6px;font-family:inherit;font-size:10.5px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;border:none;background:transparent;color:var(--text-dim);cursor:pointer;position:relative;transition:color .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tab-btn.active{color:var(--gold);}
+  .tab-btn.active::after{content:'';position:absolute;bottom:0;left:16px;right:16px;height:2.5px;border-radius:2px 2px 0 0;background:var(--gold);}
+  .tab-btn:hover{color:var(--text);}
+
+  .map-style-row{display:flex;margin:12px 22px 0;gap:6px;}
+  .style-chip{flex:1;padding:6px 6px;border:1px solid var(--border);border-radius:7px;font-family:inherit;font-size:10px;font-weight:500;cursor:pointer;background:transparent;color:var(--text-dim);text-align:center;transition:all .15s;}
+  .style-chip.active{border-color:var(--gold);color:var(--gold);background:rgba(158,124,56,.06);}
+  .style-chip:hover{border-color:var(--text-dim);}
+
+  .filter-section{padding:14px 22px;border-bottom:1px solid var(--border);}
+  .filter-section h3{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:8px;font-weight:600;}
+  .filter-row{display:flex;flex-wrap:wrap;gap:5px;}
+  .filter-chip{display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:16px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;transition:all .15s;font-size:11px;color:var(--text-dim);user-select:none;}
+  .filter-chip:hover{border-color:var(--text-dim);color:var(--text);}
+  .filter-chip.active{border-color:currentColor;color:var(--text);}
+  .filter-chip .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+  /* List panels */
+  .list-panel{flex:1;overflow-y:auto;padding:14px 22px;display:none;}
+  .list-panel.active{display:block;}
+  .list-panel h3{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:10px;font-weight:600;}
+  .group-label{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-dim);padding:12px 0 6px;border-top:1px solid var(--border);margin-top:8px;font-weight:500;}
+  .group-label:first-child{border-top:none;margin-top:0;padding-top:0;}
+
+  .card{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--radius);background:var(--surface2);margin-bottom:6px;cursor:pointer;transition:all .18s;border:1px solid transparent;position:relative;}
+  .card:hover{background:var(--bg);border-color:var(--border);transform:translateX(2px);}
+  .card.active{border-color:var(--aed);background:var(--accent-glow);}
+  .card.active-mp{border-color:var(--menstrual);background:rgba(156,95,181,.06);}
+  .card .card-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+  .card .card-body{flex:1;min-width:0;}
+  .card .card-title{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .card .card-sub{font-size:11px;color:var(--text-dim);margin-top:2px;line-height:1.45;}
+  .card .card-badge{position:absolute;top:8px;right:10px;font-size:9px;padding:2px 7px;border-radius:4px;background:var(--surface);color:var(--text-dim);font-weight:600;letter-spacing:.04em;border:1px solid var(--border);}
+
+  .stat-bar{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:10px;background:linear-gradient(0deg,rgba(158,124,56,.02) 0%,transparent 100%);}
+  .stat{flex:1;text-align:center;}
+  .stat .num{font-size:20px;font-weight:700;font-family:'Playfair Display',serif;}
+  .stat .label{font-size:9px;color:var(--text-dim);margin-top:2px;text-transform:uppercase;letter-spacing:.06em;font-weight:500;}
+  .stat-aed .num{color:var(--aed);}
+  .stat-mp .num{color:var(--menstrual);}
+  .stat-bldg .num{color:var(--gold);}
+  .stat-bp .num{color:var(--bluephone);}
+
+  /* ===== MAP ===== */
+  .map-wrap{flex:1;position:relative;}
+  #map{width:100%;height:100%;}
+  .leaflet-container{background:var(--bg)!important;}
+  .leaflet-control-zoom{display:none!important;}
+  .leaflet-control-attribution{background:rgba(255,255,255,.88)!important;color:var(--text-dim)!important;font-size:10px!important;backdrop-filter:blur(6px);}
+  .leaflet-control-attribution a{color:var(--gold)!important;}
+
+  /* Info panel overlay */
+  .info-panel{position:absolute;bottom:20px;left:20px;width:380px;max-height:calc(100vh - 80px);overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-lg);z-index:900;transform:translateY(120%);opacity:0;transition:all .3s cubic-bezier(.4,0,.2,1);pointer-events:none;}
+  .info-panel.open{transform:translateY(0);opacity:1;pointer-events:auto;}
+  .info-panel-header{display:flex;align-items:center;gap:12px;padding:18px 20px 14px;border-bottom:1px solid var(--border);}
+  .info-panel-header .ip-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+  .info-panel-header .ip-title{font-size:15px;font-weight:700;font-family:'Playfair Display',serif;line-height:1.3;}
+  .info-panel-header .ip-cat{font-size:11px;color:var(--text-dim);margin-top:2px;}
+  .info-panel-close{position:absolute;top:14px;right:16px;width:28px;height:28px;border-radius:7px;border:none;background:var(--surface2);color:var(--text-dim);cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+  .info-panel-close:hover{background:var(--accent);color:#fff;}
+  .info-panel-body{padding:14px 20px 18px;}
+  .ip-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;}
+  .ip-row:last-child{margin-bottom:0;}
+  .ip-row-icon{font-size:14px;width:20px;text-align:center;flex-shrink:0;margin-top:1px;}
+  .ip-row-text{font-size:12px;color:var(--text-dim);line-height:1.55;}
+  .ip-row-text strong{color:var(--text);font-weight:600;}
+  .ip-row-text .highlight{font-weight:600;}
+  .ip-row-text .hl-aed{color:var(--aed);}
+  .ip-row-text .hl-mp{color:var(--menstrual);}
+  .ip-row-text .hl-vend{color:var(--vending);}
+
+  /* Legend */
+  .legend{position:absolute;top:16px;left:16px;z-index:800;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;box-shadow:var(--shadow-md);max-width:200px;}
+  .legend h4{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-dim);margin-bottom:8px;font-weight:600;}
+  .legend-item{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text);margin-bottom:5px;}
+  .legend-item:last-child{margin-bottom:0;}
+  .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 2px rgba(255,255,255,.8),0 1px 3px rgba(0,0,0,.15);}
+  .legend-toggle{position:absolute;top:6px;right:8px;background:none;border:none;font-size:14px;cursor:pointer;color:var(--text-dim);padding:2px;line-height:1;}
+  .legend-body{overflow:hidden;transition:max-height .2s;}
+
+  /* Search */
+  .search-box{position:absolute;top:16px;right:16px;z-index:800;display:flex;gap:6px;}
+  .search-box input{width:270px;padding:10px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:inherit;font-size:13px;outline:none;box-shadow:var(--shadow-md);}
+  .search-box input:focus{border-color:var(--gold);box-shadow:var(--shadow-md),0 0 0 3px rgba(158,124,56,.1);}
+  .search-box input::placeholder{color:var(--text-dim);}
+  .search-box button{padding:10px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;font-size:14px;box-shadow:var(--shadow-md);transition:all .15s;}
+  .search-box button:hover{border-color:var(--gold);background:rgba(158,124,56,.04);}
+  .search-dropdown{position:absolute;top:100%;right:0;margin-top:6px;width:340px;max-height:360px;overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);display:none;z-index:810;}
+  .search-dropdown.open{display:block;}
+  .search-dropdown .sr-group-label{padding:8px 14px 4px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-dim);border-top:1px solid var(--border);}
+  .search-dropdown .sr-group-label:first-child{border-top:none;}
+  .search-dropdown .sr-item{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;transition:background .1s;font-size:13px;color:var(--text);}
+  .search-dropdown .sr-item:hover,.search-dropdown .sr-item.active{background:var(--surface2);}
+  .search-dropdown .sr-item .sr-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:var(--surface2);}
+  .search-dropdown .sr-item .sr-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .search-dropdown .sr-item .sr-name mark{background:none;color:var(--gold);font-weight:700;}
+  .search-dropdown .sr-item .sr-cat{font-size:10px;color:var(--text-dim);flex-shrink:0;}
+  .search-dropdown .sr-empty{padding:20px;text-align:center;color:var(--text-dim);font-size:12px;}
+
+  /* Controls */
+  .zoom-controls{position:absolute;bottom:30px;right:16px;display:flex;flex-direction:column;gap:4px;z-index:800;}
+  .zoom-btn{width:40px;height:40px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;box-shadow:var(--shadow-sm);}
+  .zoom-btn:hover{background:var(--surface2);border-color:var(--gold);}
+
+  /* Markers */
+  .aed-marker{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--aed);box-shadow:0 2px 8px rgba(208,48,48,.4),0 0 0 3px rgba(255,255,255,.7);cursor:pointer;position:relative;transition:transform .15s;font-size:14px;line-height:1;z-index:600;}
+  .aed-marker::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--aed);}
+  .aed-marker:hover{transform:scale(1.25);z-index:900!important;}
+  .aed-marker .pulse{position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--aed);animation:aedPulse 2.5s ease-out infinite;pointer-events:none;}
+  @keyframes aedPulse{0%{transform:scale(1);opacity:.6;}100%{transform:scale(2.2);opacity:0;}}
+
+  .mp-marker{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;box-shadow:0 2px 8px rgba(156,95,181,.35),0 0 0 3px rgba(255,255,255,.7);cursor:pointer;position:relative;transition:transform .15s;font-size:13px;line-height:1;z-index:550;background:var(--menstrual);}
+  .mp-marker::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--menstrual);}
+  .mp-marker:hover{transform:scale(1.25);z-index:900!important;}
+  .mp-marker .mp-pulse{position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--menstrual);animation:mpPulse 3s ease-out infinite;pointer-events:none;}
+  @keyframes mpPulse{0%{transform:scale(1);opacity:.5;}100%{transform:scale(2);opacity:0;}}
+
+  .vend-marker{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;box-shadow:0 2px 8px rgba(58,138,122,.35),0 0 0 3px rgba(255,255,255,.7);cursor:pointer;position:relative;transition:transform .15s;font-size:13px;line-height:1;z-index:550;background:var(--vending);}
+  .vend-marker::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--vending);}
+  .vend-marker:hover{transform:scale(1.25);z-index:900!important;}
+
+  .campus-marker{display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.15),0 0 0 2px rgba(255,255,255,.7);cursor:pointer;position:relative;transition:transform .15s;font-size:12px;line-height:1;}
+  .campus-marker::after{content:'';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--mc,#555);}
+  .campus-marker:hover{transform:scale(1.2);z-index:800!important;}
+
+  .custom-tooltip{background:#fff!important;border:1px solid #ddd8d0!important;border-radius:8px!important;padding:8px 12px!important;font-family:'DM Sans',sans-serif!important;font-size:12px!important;color:#1a1a1a!important;box-shadow:0 8px 24px rgba(0,0,0,.1)!important;line-height:1.5!important;max-width:240px!important;}
+  .leaflet-tooltip-top:before{border-top-color:#ddd8d0!important;}
+
+  /* AED Cluster markers */
+  .aed-cluster{display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--aed);color:#fff;font-family:'DM Sans',sans-serif;font-weight:700;box-shadow:0 3px 12px rgba(208,48,48,.5),0 0 0 4px rgba(255,255,255,.6);cursor:pointer;transition:transform .15s;}
+  .aed-cluster:hover{transform:scale(1.15);}
+  .aed-cluster-small{width:36px;height:36px;font-size:13px;}
+  .aed-cluster-medium{width:44px;height:44px;font-size:15px;}
+  .aed-cluster-large{width:52px;height:52px;font-size:17px;}
+  .aed-cluster .cluster-ring{position:absolute;inset:-5px;border-radius:50%;border:2.5px solid var(--aed);opacity:.4;animation:clusterPulse 3s ease-out infinite;pointer-events:none;}
+  @keyframes clusterPulse{0%{transform:scale(1);opacity:.4;}100%{transform:scale(1.8);opacity:0;}}
+  .leaflet-cluster-anim .leaflet-marker-icon,.leaflet-cluster-anim .leaflet-marker-shadow{transition:transform .3s ease-out, opacity .3s ease-in;}
+  .marker-cluster{background:none!important;border:none!important;}
+
+  /* MP Cluster markers */
+  .mp-cluster{display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--menstrual);color:#fff;font-family:'DM Sans',sans-serif;font-weight:700;box-shadow:0 3px 12px rgba(156,95,181,.5),0 0 0 4px rgba(255,255,255,.6);cursor:pointer;transition:transform .15s;}
+  .mp-cluster:hover{transform:scale(1.15);}
+  .mp-cluster-small{width:34px;height:34px;font-size:12px;}
+  .mp-cluster-medium{width:42px;height:42px;font-size:14px;}
+
+  #loadError{display:none;position:fixed;inset:0;background:var(--bg);z-index:9999;justify-content:center;align-items:center;flex-direction:column;gap:16px;color:var(--text);font-size:16px;text-align:center;padding:40px;}
+  ::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}::-webkit-scrollbar-thumb:hover{background:#bbb5ac;}
+
+  /* Mobile */
+  @media(max-width:800px){
+    .sidebar{width:100%;min-width:0;max-height:45vh;border-right:none;border-bottom:1px solid var(--border);}
+    body{flex-direction:column;}
+    .map-wrap{flex:1;min-height:55vh;}
+    .info-panel{width:calc(100% - 32px);left:16px;bottom:16px;}
+    .legend{display:none;}
+  }
+
+  /* ===== EDIT MODE ===== */
+  .zoom-btn.edit-active{background:var(--gold);color:#fff;border-color:var(--gold);}
+  .edit-panel{position:absolute;bottom:30px;right:66px;z-index:800;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow-md);width:250px;display:none;}
+  .edit-panel.open{display:block;}
+  .edit-panel-header{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);margin-bottom:5px;}
+  .edit-panel p{font-size:11px;color:var(--text-dim);line-height:1.4;margin-bottom:8px;}
+  .edit-changes{max-height:150px;overflow-y:auto;margin-bottom:8px;}
+  .edit-change-row{display:flex;align-items:baseline;justify-content:space-between;gap:6px;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px;}
+  .edit-change-row:last-child{border-bottom:none;}
+  .ec-name{color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+  .ec-coords{color:var(--text-dim);font-size:9.5px;font-family:monospace;flex-shrink:0;}
+  .edit-no-changes{font-size:11px;color:var(--text-dim);font-style:italic;padding:3px 0 6px;}
+  .edit-actions{display:flex;gap:6px;}
+  .edit-btn{flex:1;padding:6px 8px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);font-family:inherit;font-size:11px;font-weight:500;cursor:pointer;color:var(--text);transition:all .15s;text-align:center;}
+  .edit-btn:hover{border-color:var(--gold);color:var(--gold);}
+  .edit-btn.primary{background:var(--gold);color:#fff;border-color:var(--gold);}
+  .edit-btn.primary:hover{background:#8a6b2e;}
+
+  /* ===== FIRST AID MARKERS ===== */
+  :root { --firstaid:#2d8a5a; }
+  .fa-marker{display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--firstaid);box-shadow:0 2px 8px rgba(45,138,90,.4),0 0 0 3px rgba(255,255,255,.7);cursor:pointer;position:relative;transition:transform .15s;font-size:13px;line-height:1;z-index:500;}
+  .fa-marker::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--firstaid);}
+  .fa-marker:hover{transform:scale(1.25);z-index:900!important;}
+  .fa-cluster{display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--firstaid);color:#fff;font-family:'DM Sans',sans-serif;font-weight:700;box-shadow:0 3px 12px rgba(45,138,90,.5),0 0 0 4px rgba(255,255,255,.6);cursor:pointer;transition:transform .15s;width:36px;height:36px;font-size:13px;}
+  .fa-cluster:hover{transform:scale(1.15);}
+  .badge-firstaid{background:rgba(45,138,90,.08);color:var(--firstaid);border:1px solid rgba(45,138,90,.2);}
+
+  /* ===== BLUE-LIGHT PHONE & ACCESSIBLE PARKING ===== */
+  :root { --bluephone:#1565d8; --parking:#3949ab; }
+  .bp-marker{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--bluephone);box-shadow:0 2px 8px rgba(21,101,216,.45),0 0 0 3px rgba(255,255,255,.7);cursor:pointer;position:relative;transition:transform .15s;font-size:13px;line-height:1;z-index:520;}
+  .bp-marker::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--bluephone);}
+  .bp-marker:hover{transform:scale(1.25);z-index:900!important;}
+  .bp-marker .bp-pulse{position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--bluephone);animation:bpPulse 2.8s ease-out infinite;pointer-events:none;}
+  @keyframes bpPulse{0%{transform:scale(1);opacity:.5;}100%{transform:scale(2);opacity:0;}}
+  .bp-cluster{display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--bluephone);color:#fff;font-family:'DM Sans',sans-serif;font-weight:700;box-shadow:0 3px 12px rgba(21,101,216,.5),0 0 0 4px rgba(255,255,255,.6);cursor:pointer;transition:transform .15s;width:36px;height:36px;font-size:13px;}
+  .bp-cluster:hover{transform:scale(1.15);}
+  .park-marker{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;background:var(--parking);box-shadow:0 2px 8px rgba(57,73,171,.4),0 0 0 3px rgba(255,255,255,.7);cursor:pointer;position:relative;transition:transform .15s;font-size:14px;line-height:1;z-index:510;color:#fff;}
+  .park-marker::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--parking);}
+  .park-marker:hover{transform:scale(1.25);z-index:900!important;}
+  .badge-bluephone{background:rgba(21,101,216,.08);color:var(--bluephone);border:1px solid rgba(21,101,216,.2);}
+  .badge-parking{background:rgba(57,73,171,.08);color:var(--parking);border:1px solid rgba(57,73,171,.2);}
+  .conf-badge{display:inline-block;font-size:9px;font-weight:600;padding:2px 7px;border-radius:4px;letter-spacing:.03em;text-transform:uppercase;}
+  .card-badge.conf-high,.conf-badge.conf-high{background:rgba(58,122,84,.14);color:#2f6a47;border-color:transparent;}
+  .card-badge.conf-medium,.conf-badge.conf-medium{background:rgba(176,120,40,.16);color:#8a5e1e;border-color:transparent;}
+  .card-badge.conf-low,.conf-badge.conf-low{background:rgba(201,64,64,.12);color:#a23a3a;border-color:transparent;}
+</style>
+</head>
+<body>
+
+<div id="loadError">
+  <h2>&#9888; Map libraries failed to load</h2>
+  <p>This app requires an internet connection.<br>Please open in a browser with internet access.</p>
+</div>
+
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h1>Oberlin College</h1>
+    <p>Campus Safety &amp; Wellness Map</p>
+    <div class="subtitle">
+      <span class="badge badge-aed">&#x2764;&#xFE0F; AEDs</span>
+      <span class="badge badge-wellness">&#x1FA78; Menstrual Products</span>
+      <span class="badge badge-safety">&#x1F3DB; Buildings</span>
+      <span class="badge badge-firstaid">&#x1F9F0; First Aid</span>
+      <span class="badge badge-bluephone">&#x1F4DE; Blue Phones</span>
+      <span class="badge badge-parking">&#x267F; Parking</span>
+    </div>
+  </div>
+
+  <div class="tab-row">
+    <button class="tab-btn active" data-tab="aed">&#x2764;&#xFE0F; AEDs</button>
+    <button class="tab-btn" data-tab="menstrual">&#x1FA78; Products</button>
+    <button class="tab-btn" data-tab="buildings">&#x1F3DB; Buildings</button>
+    <button class="tab-btn" data-tab="firstaid">&#x1F9F0; First Aid</button>
+    <button class="tab-btn" data-tab="bluephone">&#x1F4DE; Phones</button>
+    <button class="tab-btn" data-tab="parking">&#x267F; Parking</button>
+  </div>
+
+  <div class="map-style-row">
+    <button class="style-chip active" data-style="standard">Standard</button>
+    <button class="style-chip" data-style="satellite">Satellite</button>
+  </div>
+
+  <div class="filter-section">
+    <h3>Show on Map</h3>
+    <div class="filter-row">
+      <div class="filter-chip active" data-filter="aed"><div class="dot" style="background:var(--aed)"></div>AEDs</div>
+      <div class="filter-chip active" data-filter="dispenser"><div class="dot" style="background:var(--menstrual)"></div>Dispensers</div>
+      <div class="filter-chip active" data-filter="vending"><div class="dot" style="background:var(--vending)"></div>Vending</div>
+      <div class="filter-chip active" data-filter="campus"><div class="dot" style="background:var(--gold)"></div>Buildings</div>
+      <div class="filter-chip active" data-filter="dining"><div class="dot" style="background:var(--orange)"></div>Dining</div>
+      <div class="filter-chip active" data-filter="residence"><div class="dot" style="background:var(--blue)"></div>Residence</div>
+      <div class="filter-chip active" data-filter="firstaid"><div class="dot" style="background:var(--firstaid)"></div>First Aid</div>
+      <div class="filter-chip active" data-filter="bluephone"><div class="dot" style="background:var(--bluephone)"></div>Blue Phones</div>
+      <div class="filter-chip active" data-filter="parking"><div class="dot" style="background:var(--parking)"></div>Parking</div>
+    </div>
+  </div>
+
+  <!-- AED list panel -->
+  <div class="list-panel active" id="panel-aed">
+    <h3>AED Locations <span style="color:var(--aed)" id="aedCountLabel"></span></h3>
+    <div id="aedList"></div>
+  </div>
+
+  <!-- Menstrual products panel -->
+  <div class="list-panel" id="panel-menstrual">
+    <h3>Menstrual Product Locations</h3>
+    <div id="mpList"></div>
+  </div>
+
+  <!-- First aid panel -->
+  <div class="list-panel" id="panel-firstaid">
+    <h3>First Aid Cabinets <span style="color:var(--firstaid)" id="faCountLabel"></span></h3>
+    <div id="faList"></div>
+  </div>
+
+  <!-- Buildings panel -->
+  <div class="list-panel" id="panel-buildings">
+    <h3>Campus Buildings</h3>
+    <div id="bldgList"></div>
+  </div>
+
+  <!-- Blue-light phones panel -->
+  <div class="list-panel" id="panel-bluephone">
+    <h3>Blue-Light Emergency Phones <span style="color:var(--bluephone)" id="bpCountLabel"></span></h3>
+    <div id="bpList"></div>
+  </div>
+
+  <!-- Accessible parking panel -->
+  <div class="list-panel" id="panel-parking">
+    <h3>Accessible Parking <span style="color:var(--parking)" id="parkCountLabel"></span></h3>
+    <div id="parkList"></div>
+  </div>
+
+  <div class="stat-bar">
+    <div class="stat stat-aed"><div class="num" id="statAed">8</div><div class="label">AEDs</div></div>
+    <div class="stat stat-mp"><div class="num" id="statMp">0</div><div class="label">Product Sites</div></div>
+    <div class="stat stat-bldg"><div class="num" id="statBldg">0</div><div class="label">Buildings</div></div>
+    <div class="stat stat-bp"><div class="num" id="statBp">0</div><div class="label">Blue Phones</div></div>
+  </div>
+</div>
+
+<div class="map-wrap" id="mapWrap">
+  <div id="map"></div>
+
+  <div class="legend" id="legend">
+    <button class="legend-toggle" id="legendToggle">&#x25B2;</button>
+    <h4>Legend</h4>
+    <div class="legend-body" id="legendBody">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--aed)"></div>AED (Defibrillator)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--firstaid)"></div>First Aid Cabinet</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--menstrual)"></div>Free Dispenser (Pads/Tampons)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--vending);border-radius:3px"></div>Health Vending Machine</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div>Academic / Other</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div>Dining</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Residence</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--bluephone)"></div>Blue-Light Emergency Phone</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--parking);border-radius:3px"></div>Accessible Parking</div>
+    </div>
+  </div>
+
+  <div class="search-box" id="searchBox">
+    <input type="text" id="searchInput" placeholder="Search buildings, AEDs, products..." autocomplete="off">
+    <button id="btnSearch">&#x1F50D;</button>
+    <div class="search-dropdown" id="searchDropdown"></div>
+  </div>
+
+  <div class="info-panel" id="infoPanel">
+    <button class="info-panel-close" id="infoPanelClose">&times;</button>
+    <div class="info-panel-header">
+      <div class="ip-icon" id="ipIcon"></div>
+      <div><div class="ip-title" id="ipTitle"></div><div class="ip-cat" id="ipCat"></div></div>
+    </div>
+    <div class="info-panel-body" id="ipBody"></div>
+  </div>
+
+  <div class="edit-panel" id="editPanel">
+    <div class="edit-panel-header">&#x270F;&#xFE0F; Edit Mode</div>
+    <p>Drag any marker to reposition it. Zoom in to uncluster first.</p>
+    <div class="edit-changes" id="editChanges"><div class="edit-no-changes">No changes yet — drag a marker to start.</div></div>
+    <div class="edit-actions">
+      <button class="edit-btn" id="btnExitEdit">Exit Edit Mode</button>
+      <button class="edit-btn primary" id="btnExportChanges">Copy Coords</button>
+    </div>
+  </div>
+
+  <div class="zoom-controls">
+    <button class="zoom-btn" id="btnZoomIn">+</button>
+    <button class="zoom-btn" id="btnZoomOut">&minus;</button>
+    <button class="zoom-btn" id="btnReset" style="font-size:13px">&#x27F2;</button>
+    <button class="zoom-btn" id="btnEditMode" title="Edit Mode: drag markers to reposition">&#x270F;&#xFE0F;</button>
+  </div>
+</div>
+
+<script>
+window.addEventListener('load', function() {
+  if (typeof L === 'undefined') {
+    document.getElementById('loadError').style.display = 'flex';
+    document.getElementById('sidebar').style.display = 'none';
+    document.getElementById('mapWrap').style.display = 'none';
+    return;
+  }
+
+  var OBERLIN = [41.2940, -82.2200];
+
+  // ===== AED DATA =====
+  // Coordinates 
+  var AEDS = [
+    { id:'aed1', name:'Copy Machine / Mailbox Room', building:'Philips Physical Ed Center', floor:'1st Floor',
+      lat:41.29740, lng:-82.22320,
+      detail:'Located in the Copy Machine and Mailbox Room on the first floor of Philips Gym.',
+      access:'Accessible during building operating hours. Look for the AED wall cabinet near the copier and mailboxes.',
+      icon:'\u2764\uFE0F', color:'#d03030' },
+    { id:'aed2', name:'Carr Pool \u2014 Near Wet Classroom', building:'Philips Physical Ed Center', floor:'1st Floor',
+      lat:41.29795, lng:-82.22220,
+      detail:'Mounted on the wall near the Wet Classroom at Carr Pool.',
+      access:'Enter through the pool area. AED is on the wall adjacent to the Wet Classroom entrance.',
+      icon:'\u2764\uFE0F', color:'#d03030' },
+    { id:'aed3', name:'Heisman Club Field House \u2014 Ticket Booth', building:'Philips Physical Ed Center', floor:'1st Floor',
+      lat:41.29810, lng:-82.22310,
+      detail:'On the wall by the door leading to the Ticket Booth inside the Heisman Club Field House.',
+      access:'Enter the Field House; the AED is mounted near the Ticket Booth doorway.',
+      icon:'\u2764\uFE0F', color:'#d03030' },
+    { id:'aed4', name:'Shanks Hallway \u2014 by Rm H107', building:'Philips Physical Ed Center', floor:'1st Floor',
+      lat:41.29755, lng:-82.22250,
+      detail:'In the Shanks Hallway between the restroom and Multipurpose Room H107.',
+      access:'Walk down the Shanks hallway on the first floor. AED is wall-mounted between the restroom entrance and Room H107.',
+      icon:'\u2764\uFE0F', color:'#d03030' },
+    { id:'aed5', name:'Weight Room \u2014 Behind Monitor\'s Desk', building:'Philips Physical Ed Center', floor:'2nd Floor',
+      lat:41.29770, lng:-82.22270,
+      detail:'On the back wall behind the monitor\'s desk in the Weight Room.',
+      access:'Take the stairs or elevator to the 2nd floor. Enter the Weight Room; the AED is on the back wall behind the monitor\'s desk.',
+      icon:'\u2764\uFE0F', color:'#d03030' },
+    { id:'aed6', name:'Room K116 \u2014 Biology', building:'Kettering Hall (Science Center)', floor:'1st Floor',
+      lat:41.29490, lng:-82.22100,
+      detail:'AED located in Room K116 of Kettering Hall, the Biology department area of the Science Center.',
+      access:'Enter Kettering Hall and locate Room K116 on the first floor in the Biology wing.',
+      icon:'\u2764\uFE0F', color:'#d03030' },
+    { id:'aed7', name:'Room A261 \u2014 Neuroscience', building:'Science Center', floor:'2nd Floor',
+      lat:41.29545, lng:-82.22170,
+      detail:'AED in Room A261 of the Science Center, within the Neuroscience department area.',
+      access:'Go to the 2nd floor of the Science Center main building. Room A261 is in the Neuroscience wing.',
+      icon:'\u2764\uFE0F', color:'#d03030' },
+    { id:'aed8', name:'Room A263 \u2014 Chemistry', building:'Science Center', floor:'2nd Floor',
+      lat:41.29510, lng:-82.22110,
+      detail:'AED in Room A263 of the Science Center, within the Chemistry department area.',
+      access:'Go to the 2nd floor of the Science Center main building. Room A263 is near the Chemistry labs.',
+      icon:'\u2764\uFE0F', color:'#d03030' },
+  ];
+
+  // ===== MENSTRUAL PRODUCT DATA =====
+  // Coordinates corrected to precise footprints
+  var MENSTRUAL = [
+    { id:'mp1', name:'King Building \u2014 1st Floor', building:'King Building', floor:'1st Floor',
+      type:'dispenser', lat:41.2923, lng:-82.2207,
+      detail:'Aunt Flow dispenser in the Women\'s Restroom on the 1st floor of King Building. Provides free regular absorbency pads (with wings) and tampons (cardboard applicators).',
+      access:'Enter King Building and find the Women\'s Restroom on the 1st floor. The dispenser is wall-mounted inside the restroom.',
+      products:'Regular absorbency pads (with wings), tampons (cardboard applicators)',
+      restock:'Restocked weekly by Student Health. If empty or jammed, email anadkarn@oberlin.edu and abaptist@oberlin.edu.',
+      icon:'\uD83E\uDE78', color:'#9c5fb5' },
+    { id:'mp2', name:'King Building \u2014 2nd Floor', building:'King Building', floor:'2nd Floor',
+      type:'dispenser', lat:41.29235, lng:-82.22075,
+      detail:'Aunt Flow dispenser in the Women\'s Restroom on the 2nd floor of King Building. Free pads and tampons available.',
+      access:'Take the stairs to the 2nd floor of King Building and locate the Women\'s Restroom.',
+      products:'Regular absorbency pads (with wings), tampons (cardboard applicators)',
+      restock:'Restocked weekly by Student Health. If empty or jammed, email anadkarn@oberlin.edu and abaptist@oberlin.edu.',
+      icon:'\uD83E\uDE78', color:'#9c5fb5' },
+    { id:'mp3', name:'Conservatory \u2014 1st Floor', building:'Conservatory of Music', floor:'1st Floor',
+      type:'dispenser', lat:41.2910, lng:-82.2194,
+      detail:'Aunt Flow dispenser in the Women\'s Restroom on the 1st floor of the Conservatory of Music. Free menstrual products.',
+      access:'Enter the Conservatory of Music main entrance and locate the Women\'s Restroom on the 1st floor.',
+      products:'Regular absorbency pads (with wings), tampons (cardboard applicators)',
+      restock:'Restocked weekly by Student Health. If empty or jammed, email anadkarn@oberlin.edu and abaptist@oberlin.edu.',
+      icon:'\uD83E\uDE78', color:'#9c5fb5' },
+    { id:'mp4', name:'Warner Center \u2014 1st Floor', building:'Warner Center', floor:'1st Floor',
+      type:'dispenser', lat:41.2934, lng:-82.2216,
+      detail:'Aunt Flow dispenser in the Multi-Stall Restroom on the 1st floor of Warner Center. Free pads and tampons.',
+      access:'Enter Warner Center and find the Multi-Stall Restroom on the 1st floor. Dispenser is mounted on the wall inside.',
+      products:'Regular absorbency pads (with wings), tampons (cardboard applicators)',
+      restock:'Restocked weekly by Student Health. If empty or jammed, email anadkarn@oberlin.edu and abaptist@oberlin.edu.',
+      icon:'\uD83E\uDE78', color:'#9c5fb5' },
+    { id:'mp5', name:'Mudd Center \u2014 1st Floor', building:'Mudd Center / Main Library', floor:'1st Floor',
+      type:'dispenser', lat:41.2931, lng:-82.2229,
+      detail:'Aunt Flow dispenser in the Individual Restrooms on the 1st floor of Mudd Center (Main Library). Free menstrual products.',
+      access:'Enter Mudd Center and find the Individual Restrooms on the 1st floor. Check inside for the wall-mounted dispenser.',
+      products:'Regular absorbency pads (with wings), tampons (cardboard applicators)',
+      restock:'Restocked weekly by Student Health. If empty or jammed, email anadkarn@oberlin.edu and abaptist@oberlin.edu.',
+      icon:'\uD83E\uDE78', color:'#9c5fb5' },
+    { id:'mp6', name:'Wilder Hall \u2014 1st Floor', building:'Wilder Hall (Student Union)', floor:'1st Floor',
+      type:'dispenser', lat:41.2938, lng:-82.2222,
+      detail:'Aunt Flow dispenser in the Multi-Stall Restroom on the 1st floor of Wilder Hall (Student Union). Free pads and tampons.',
+      access:'Enter Wilder Hall and find the Multi-Stall Restroom on the 1st floor. The Aunt Flow dispenser is wall-mounted inside.',
+      products:'Regular absorbency pads (with wings), tampons (cardboard applicators)',
+      restock:'Restocked weekly by Student Health. If empty or jammed, email anadkarn@oberlin.edu and abaptist@oberlin.edu.',
+      icon:'\uD83E\uDE78', color:'#9c5fb5' },
+    { id:'mp7', name:'Science Center \u2014 1st Floor', building:'Science Center', floor:'1st Floor',
+      type:'dispenser', lat:41.29525, lng:-82.22130,
+      detail:'Aunt Flow dispenser in the Women\'s Restroom on the 1st floor of the Science Center. Free menstrual products.',
+      access:'Enter the Science Center and find the Women\'s Restroom on the 1st floor.',
+      products:'Regular absorbency pads (with wings), tampons (cardboard applicators)',
+      restock:'Restocked weekly by Student Health. If empty or jammed, email anadkarn@oberlin.edu and abaptist@oberlin.edu.',
+      icon:'\uD83E\uDE78', color:'#9c5fb5' },
+    { id:'mp8', name:'Science Center \u2014 2nd Floor', building:'Science Center', floor:'2nd Floor',
+      type:'dispenser', lat:41.29535, lng:-82.22150,
+      detail:'Aunt Flow dispenser in the Women\'s Restroom on the 2nd floor of the Science Center. Free pads and tampons.',
+      access:'Take the stairs or elevator to the 2nd floor of the Science Center. Locate the Women\'s Restroom.',
+      products:'Regular absorbency pads (with wings), tampons (cardboard applicators)',
+      restock:'Restocked weekly by Student Health. If empty or jammed, email anadkarn@oberlin.edu and abaptist@oberlin.edu.',
+      icon:'\uD83E\uDE78', color:'#9c5fb5' },
+    { id:'vm1', name:'Science Center \u2014 Vending Area', building:'Science Center', floor:'1st Floor',
+      type:'vending', lat:41.29540, lng:-82.22160,
+      detail:'Health product vending machine in the 1st floor vending area of the Science Center. Offers menstrual products plus additional health and reproductive supplies.',
+      access:'Enter the Science Center and find the 1st floor vending area. The health vending machine is alongside regular vending machines.',
+      products:'Regular absorbency pads (with wings), tampons (cardboard applicators), fentanyl & xylazine test strips, pregnancy tests, condoms, water-based lubricant',
+      restock:'Regularly stocked by Student Health. If jammed or empty, contact abaptist@oberlin.edu.',
+      icon:'\uD83C\uDFEA', color:'#3a8a7a' },
+    { id:'vm2', name:'South Hall \u2014 Basement', building:'South Hall', floor:'Basement',
+      type:'vending', lat:41.2897, lng:-82.2216,
+      detail:'Health product vending machine in the basement of South Hall. Offers menstrual products and additional health supplies.',
+      access:'Enter South Hall and head to the basement area. The health vending machine is in the common vending area.',
+      products:'Regular absorbency pads (with wings), tampons (cardboard applicators), fentanyl & xylazine test strips, pregnancy tests, condoms, water-based lubricant',
+      restock:'Regularly stocked by Student Health. If jammed or empty, contact abaptist@oberlin.edu.',
+      icon:'\uD83C\uDFEA', color:'#3a8a7a' },
+  ];
+
+  // ===== CAMPUS BUILDINGS =====
+  // Coordinates corrected to exact campus footprints
+  var CAMPUS = [
+    {name:'Peters Hall',cat:'Academic',lat:41.2930,lng:-82.2207,icon:'\uD83C\uDFDB',color:'#9e7c38',desc:'Historic academic building on Tappan Square, housing multiple departments.'},
+    {name:'King Building',cat:'Academic',lat:41.2923,lng:-82.2207,icon:'\uD83C\uDFDB',color:'#9e7c38',desc:'Academic building with classrooms and faculty offices. Has Aunt Flow dispensers on 1st & 2nd floors.'},
+    {name:'Rice Hall',cat:'Academic',lat:41.2924,lng:-82.2211,icon:'\uD83C\uDFDB',color:'#9e7c38',desc:'Academic building adjacent to King, used for classes and department offices.'},
+    {name:'Science Center',cat:'Academic',lat:41.2953,lng:-82.2214,icon:'\uD83D\uDD2C',color:'#9e7c38',desc:'Major science complex housing Chemistry, Biology, Physics, and Neuroscience. Home to 2 AEDs, 2 Aunt Flow dispensers, and a health vending machine.'},
+    {name:'Wright Laboratory of Physics',cat:'Academic',lat:41.2953,lng:-82.2205,icon:'\uD83D\uDD2C',color:'#9e7c38',desc:'Physics department and laboratory facilities.'},
+    {name:'Severance Hall',cat:'Academic',lat:41.2945,lng:-82.2203,icon:'\uD83C\uDFDB',color:'#9e7c38',desc:'Chemistry department building connected to the Science Center complex.'},
+    {name:'Carnegie Building',cat:'Academic',lat:41.2948,lng:-82.2194,icon:'\uD83C\uDFDB',color:'#9e7c38',desc:'Historic Carnegie-funded building used for academic purposes.'},
+    {name:'Warner Center',cat:'Academic',lat:41.2934,lng:-82.2216,icon:'\uD83C\uDFDB',color:'#9e7c38',desc:'Academic and student activity center. Has an Aunt Flow dispenser in the 1st floor multi-stall restroom.'},
+    {name:'Kettering Hall',cat:'Academic',lat:41.2949,lng:-82.2210,icon:'\uD83C\uDFDB',color:'#9e7c38',desc:'Part of the Science Center complex, housing Biology. Has an AED in Room K116.'},
+    {name:'Craig Lecture Hall',cat:'Academic',lat:41.2935,lng:-82.2200,icon:'\uD83C\uDFDB',color:'#9e7c38',desc:'Large lecture hall for classes and campus events.'},
+    {name:'Cox Administration Building',cat:'Admin',lat:41.2934,lng:-82.2207,icon:'\uD83C\uDFE2',color:'#6b6560',desc:'Main administrative offices for the college.'},
+    {name:'Adam Joseph Lewis Center',cat:'Academic',lat:41.2907,lng:-82.2219,icon:'\uD83C\uDF3F',color:'#3a7a54',desc:'Award-winning environmental studies center with sustainable design features.'},
+    {name:'Conservatory of Music',cat:'Conservatory',lat:41.2910,lng:-82.2194,icon:'\uD83C\uDFB6',color:'#7048a5',desc:'World-renowned music conservatory. Has an Aunt Flow dispenser in the 1st floor Women\'s Restroom.'},
+    {name:'Bibbins Hall',cat:'Conservatory',lat:41.2912,lng:-82.2192,icon:'\uD83C\uDFB5',color:'#7048a5',desc:'Practice rooms and studios for Conservatory students.'},
+    {name:'Robertson Hall',cat:'Conservatory',lat:41.2911,lng:-82.2192,icon:'\uD83C\uDFB5',color:'#7048a5',desc:'Conservatory rehearsal and performance space.'},
+    {name:'Warner Concert Hall',cat:'Conservatory',lat:41.2908,lng:-82.2196,icon:'\uD83C\uDFB6',color:'#7048a5',desc:'Primary concert venue for Conservatory performances.'},
+    {name:'Kulas Recital Hall',cat:'Conservatory',lat:41.2909,lng:-82.2191,icon:'\uD83C\uDFB5',color:'#7048a5',desc:'Intimate recital hall for solo and chamber performances.'},
+    {name:'Clonick Hall',cat:'Conservatory',lat:41.2904,lng:-82.2188,icon:'\uD83C\uDFB5',color:'#7048a5',desc:'Conservatory building with classrooms and studios.'},
+    {name:'Mudd Center / Main Library',cat:'Library',lat:41.2931,lng:-82.2229,icon:'\uD83D\uDCDA',color:'#9e7c38',desc:'Main campus library and study center. Has an Aunt Flow dispenser in 1st floor individual restrooms, plus Azariah\'s Caf\u00E9.'},
+    {name:'Allen Memorial Art Museum',cat:'Arts',lat:41.2936,lng:-82.2160,icon:'\uD83C\uDFA8',color:'#b04472',desc:'Renowned teaching art museum with a collection spanning thousands of years.'},
+    {name:'Hall Auditorium',cat:'Arts',lat:41.2929,lng:-82.2160,icon:'\uD83C\uDFAD',color:'#b04472',desc:'Performing arts venue for theater, dance, and lectures.'},
+    {name:'Finney Chapel',cat:'Landmark',lat:41.2938,lng:-82.2207,icon:'\u26EA',color:'#9e7c38',desc:'Historic chapel on Tappan Square, used for concerts, lectures, and events.'},
+    {name:'Fairchild Chapel (Bosworth Hall)',cat:'Landmark',lat:41.2947,lng:-82.2188,icon:'\u26EA',color:'#9e7c38',desc:'Small historic chapel adjacent to campus academic buildings.'},
+    {name:'First Church in Oberlin',cat:'Landmark',lat:41.2942,lng:-82.2163,icon:'\u26EA',color:'#9e7c38',desc:'Historic Oberlin church with deep ties to the college\'s abolitionist history.'},
+    {name:'Tappan Square',cat:'Landmark',lat:41.2927,lng:-82.2185,icon:'\uD83C\uDF33',color:'#3a7a54',desc:'Central park and green space at the heart of campus.'},
+    {name:'Apollo Theatre',cat:'Landmark',lat:41.2914,lng:-82.2160,icon:'\uD83C\uDFAC',color:'#b04472',desc:'Community movie theater in downtown Oberlin.'},
+    {name:'Wilder Hall (Student Union)',cat:'Student Life',lat:41.2938,lng:-82.2222,icon:'\uD83C\uDFE0',color:'#2e9488',desc:'Student union with offices, DeCaf\u00E9, meeting spaces, and an Aunt Flow dispenser in the 1st floor multi-stall restroom.'},
+    {name:'Hales Gymnasium',cat:'Athletics',lat:41.2942,lng:-82.2241,icon:'\uD83C\uDFC0',color:'#3a6ba5',desc:'Gymnasium and indoor athletic facility.'},
+    {name:'Philips Physical Ed Center',cat:'Athletics',lat:41.2977,lng:-82.2230,icon:'\uD83C\uDFC3',color:'#3a6ba5',desc:'Major athletics complex with gym, pool, field house, and weight room. Home to 5 AEDs across 1st and 2nd floors.'},
+    {name:'Stevenson Dining Hall',cat:'Dining',lat:41.2958,lng:-82.2194,icon:'\uD83C\uDF7D',color:'#b07828',desc:'North campus dining hall serving residential students.'},
+    {name:'Dascomb Dining Hall',cat:'Dining',lat:41.2918,lng:-82.2224,icon:'\uD83C\uDF7D',color:'#b07828',desc:'Central campus dining hall.'},
+    {name:'DeCaf\u00E9 (Wilder)',cat:'Dining',lat:41.2937,lng:-82.2220,icon:'\u2615',color:'#b07828',desc:'Popular caf\u00E9 in Wilder Hall student union.'},
+    {name:'Azariah\'s Caf\u00E9 (Mudd)',cat:'Dining',lat:41.2932,lng:-82.2228,icon:'\u2615',color:'#b07828',desc:'Caf\u00E9 located in Mudd Center / Main Library.'},
+    {name:'East Hall',cat:'Residence',lat:41.2966,lng:-82.2203,icon:'\uD83C\uDFE0',color:'#3a6ba5',desc:'North campus residence hall.'},
+    {name:'Noah Hall',cat:'Residence',lat:41.2966,lng:-82.2219,icon:'\uD83C\uDFE0',color:'#3a6ba5',desc:'North campus residence hall.'},
+    {name:'Barrows Hall',cat:'Residence',lat:41.2958,lng:-82.2219,icon:'\uD83C\uDFE0',color:'#3a6ba5',desc:'North campus residence hall.'},
+    {name:'Kahn Hall',cat:'Residence',lat:41.2964,lng:-82.2193,icon:'\uD83C\uDFE0',color:'#3a6ba5',desc:'North campus residence hall.'},
+    {name:'Barnard House',cat:'Residence',lat:41.2959,lng:-82.2203,icon:'\uD83C\uDFE0',color:'#3a6ba5',desc:'Small campus residence.'},
+    {name:'Burton Hall',cat:'Residence',lat:41.2972,lng:-82.2210,icon:'\uD83C\uDFE0',color:'#3a6ba5',desc:'North campus residence hall.'},
+    {name:'Talcott Hall',cat:'Residence',lat:41.2913,lng:-82.2207,icon:'\uD83C\uDFE0',color:'#3a6ba5',desc:'South campus residence hall.'},
+    {name:'South Hall',cat:'Residence',lat:41.2897,lng:-82.2216,icon:'\uD83C\uDFE0',color:'#3a6ba5',desc:'South campus residence hall. Has a health product vending machine in the basement.'},
+    {name:'Baldwin Cottage',cat:'Residence',lat:41.2917,lng:-82.2215,icon:'\uD83C\uDFE0',color:'#3a6ba5',desc:'Historic residence hall on south campus.'},
+    {name:'Dascomb Hall (Residence)',cat:'Residence',lat:41.2918,lng:-82.2224,icon:'\uD83C\uDFE0',color:'#3a6ba5',desc:'Residence hall connected to Dascomb Dining.'},
+    {name:'Langston Hall',cat:'Residence',lat:41.2978,lng:-82.2210,icon:'\uD83C\uDFE0',color:'#3a6ba5',desc:'North campus residence hall.'},
+    {name:'Harkness Co-op',cat:'Residence',lat:41.2913,lng:-82.2217,icon:'\uD83C\uDFE0',color:'#3a6ba5',desc:'Student housing cooperative with shared meals and community living.'},
+    {name:'Keep Co-op',cat:'Residence',lat:41.2955,lng:-82.2166,icon:'\uD83C\uDFE0',color:'#3a6ba5',desc:'Student housing cooperative.'},
+    {name:'Tank Hall',cat:'Residence',lat:41.2921,lng:-82.2133,icon:'\uD83C\uDFE0',color:'#3a6ba5',desc:'East campus residence hall.'},
+    {name:'Asia House',cat:'Residence',lat:41.2960,lng:-82.2195,icon:'\uD83C\uDFE0',color:'#3a6ba5',desc:'Cultural theme housing focused on Asian cultures.'},
+    {name:'Woodland Hall',cat:'Residence',lat:41.2961,lng:-82.2226,icon:'\uD83C\uDFE0',color:'#3a6ba5',desc:'North campus residence at 150 Woodland St.'},
+    {name:'Campus Safety',cat:'Safety',lat:41.2918,lng:-82.2226,icon:'\uD83D\uDEA8',color:'#d03030',desc:'Campus Safety office \u2014 call for emergencies or safety concerns.'},
+    {name:'Hotel at Oberlin / Gateway Center',cat:'Other',lat:41.2920,lng:-82.2158,icon:'\uD83C\uDFE8',color:'#6b6560',desc:'Campus hotel and conference center.'},
+    {name:'Arts & Sciences Admissions',cat:'Admin',lat:41.2922,lng:-82.2169,icon:'\uD83C\uDFE2',color:'#6b6560',desc:'Admissions office for prospective students.'},
+  ];
+
+  // ===== FIRST AID CABINET DATA =====
+  var FIRSTAID = [
+    {id:'fa1',building:'South Hall',lat:41.2897,lng:-82.2216,
+     cabinets:['Cab 16 — 2nd Floor Kitchen','Cab 17 — Basement Custodial Office','Cab 18 — Main Downstairs Kitchen (Bake Shop)']},
+    {id:'fa2',building:'Baldwin Cottage',lat:41.2917,lng:-82.2215,
+     cabinets:['Cab 3 — Kitchen']},
+    {id:'fa3',building:'Talcott Hall',lat:41.2913,lng:-82.2207,
+     cabinets:['Cab 4 — Kosher Co-op Kitchen','Cab 72 — 2nd Floor Kitchen']},
+    {id:'fa4',building:'Harkness Co-op',lat:41.2913,lng:-82.2217,
+     cabinets:['Cab 15 — Basement Kitchen']},
+    {id:'fa5',building:'Dascomb',lat:41.2918,lng:-82.2224,
+     cabinets:['Cab 26 — Main Floor Kitchen','Cab 27 — 2nd Floor Kitchen']},
+    {id:'fa6',building:'Rice Hall',lat:41.2924,lng:-82.2211,
+     cabinets:['Cab 14 — 1st Floor Lounge']},
+    {id:'fa7',building:'King Building',lat:41.2923,lng:-82.2207,
+     cabinets:['Cab 13 — Basement Custodial']},
+    {id:'fa8',building:'Peters Hall',lat:41.2930,lng:-82.2207,
+     cabinets:['Cab 90 — 3rd Floor Office','Cab 91 — Room 205','Room 118']},
+    {id:'fa9',building:'Cox Administration Building',lat:41.2934,lng:-82.2207,
+     cabinets:['Cab 42 — Administration']},
+    {id:'fa10',building:'Finney Chapel',lat:41.2938,lng:-82.2207,
+     cabinets:['Cab 115 — Chapel']},
+    {id:'fa11',building:'Warner Center',lat:41.2934,lng:-82.2216,
+     cabinets:['Cab 92 — Room 100 Drawer','Cab 119 — 2nd Floor','Cab 120 — 1st Floor Ticket Booth']},
+    {id:'fa12',building:'Mudd Center / Main Library',lat:41.2931,lng:-82.2229,
+     cabinets:['Cab 88 — Behind Front Desk','Cab 89 — Basement CIT','Cab 200 — Basement (Bill\'s Trauma Box)']},
+    {id:'fa13',building:'Wilder Hall (Student Union)',lat:41.2938,lng:-82.2222,
+     cabinets:['Cab 93 — Kitchen','Cab 94 — Front Desk','Cab 100 — Disco Area','Cab 116 — Room 111','Cab 117 — Mail Room','Cab 200 — Room 105']},
+    {id:'fa14',building:'Campus Safety',lat:41.2918,lng:-82.2226,
+     cabinets:['Tackle Boxes & Safety Equipment','Cab 66 — Security Building']},
+    {id:'fa15',building:'Hales Gymnasium',lat:41.2942,lng:-82.2241,
+     cabinets:['Cab 168 — Hales','Cab 176 — Cat in the Cream','Cab 55 — Gym']},
+    {id:'fa16',building:'Philips Physical Ed Center',lat:41.2977,lng:-82.2230,
+     cabinets:['Cab 68 — Front Desk','Cab 70 — Equipment Room','Cab 71 — Pool Office','Cab 69 — Heisman Field House']},
+    {id:'fa17',building:'Langston Hall',lat:41.2978,lng:-82.2210,
+     cabinets:['Cab 24 — 2nd Floor Kitchen','Cab 25 — Custodial Office','Cab 121 — 1st Floor Kitchenette']},
+    {id:'fa18',building:'Burton Hall',lat:41.2972,lng:-82.2210,
+     cabinets:['Cab 23 — Basement Custodial','Cab 112 — 2nd Floor Kitchen']},
+    {id:'fa19',building:'Noah Hall',lat:41.2966,lng:-82.2219,
+     cabinets:['Cab 43 — Kitchen']},
+    {id:'fa20',building:'East Hall',lat:41.2966,lng:-82.2203,
+     cabinets:['Cab 11 — 2nd Floor Kitchen']},
+    {id:'fa21',building:'Barrows Hall',lat:41.2958,lng:-82.2219,
+     cabinets:['Cab 20 — Kitchen / Common Area']},
+    {id:'fa22',building:'Barnard House',lat:41.2959,lng:-82.2203,
+     cabinets:['Cab 12 — Lounge Area']},
+    {id:'fa23',building:'Severance Hall',lat:41.2945,lng:-82.2203,
+     cabinets:['Cab 167 — Faculty Studio (68½ South Professor)']},
+    {id:'fa24',building:'Wright Laboratory of Physics',lat:41.2953,lng:-82.2205,
+     cabinets:['Cabs 102, 105, 106, 107, 108 — Physics Labs','Cab 106-2 — Woodshop']},
+    {id:'fa25',building:'Science Center',lat:41.2953,lng:-82.2214,
+     cabinets:['Cab 52 — Library Office','Cab 53 — Room K118','Cab 54 — 2nd Floor Chemistry Lab','Cab 101 — Science Cart-CDS','Cab 123 — SCTR 261A Neuroscience','Cab 130 — SCTR N287','Cab 131 — SCTR N383','Cab 180 — Room K20','Cab 181 — Room A251','Cab 204 — Room K204']},
+    {id:'fa26',building:'Carnegie Building',lat:41.2948,lng:-82.2194,
+     cabinets:['Cab 45 — Word Processing','Cab 46 — Registrar','Cab 47 — Room 125','Cab 308 — Carnegie','Cab 400 — Admissions']},
+    {id:'fa27',building:'Stevenson Dining Hall',lat:41.2958,lng:-82.2194,
+     cabinets:['Cab 49 — Griswold Kitchen/Salad Prep','Cab 50 — Biggs Hall','Cab 51 — Upstairs Kitchen','Cab 177 — Small 1st Floor Kitchen']},
+    {id:'fa28',building:'Keep Co-op',lat:41.2955,lng:-82.2166,
+     cabinets:['Cab 8 — Kitchen','Cab 95 — Bike Room']},
+    {id:'fa29',building:'Asia House',lat:41.2960,lng:-82.2195,
+     cabinets:['Cab 9 — 2nd Floor Kitchen','Cab 10 — Basement Kitchen']},
+    {id:'fa30',building:'Allen Memorial Art Museum',lat:41.2936,lng:-82.2160,
+     cabinets:['Cab 1 — Museum Addition','Cab 81, 82, 83 — Museum Cabinets','Cab 201 — Security Kit']},
+    {id:'fa31',building:'Hall Auditorium',lat:41.2929,lng:-82.2160,
+     cabinets:['Cab 84 — Front Desk','Cab 85 — Side Stage','Cab 86 — Backstage 1 (Hall)','Cab 87 — Backstage 2 (Little Theater)','Cab 122 — Little Theater Control Room','Cab 133 — Back Stage']},
+    {id:'fa32',building:'Tank Hall',lat:41.2921,lng:-82.2133,
+     cabinets:['Cab 7 — Kitchen']},
+    {id:'fa33',building:'Conservatory of Music',lat:41.2910,lng:-82.2194,
+     cabinets:['Cab 38 — Basement','Cab 39 — Library','Cab 40 — Dock','Cab 41 — Room 123','Cab 170 — CBIB Piano Tech Shop','Cab 175 — CBIB Room 125']},
+    {id:'fa34',building:'Adam Joseph Lewis Center',lat:41.2907,lng:-82.2219,
+     cabinets:['Cab 5 — Kitchen']},
+    {id:'fa35',building:'Kahn Hall',lat:41.2964,lng:-82.2193,
+     cabinets:['Cab 109 — 2nd Floor Kitchen','Cab 110 — 3rd Floor Kitchen','Cab 111 — 1st Floor Kitchen']},
+    {id:'fa36',building:'Woodland Hall',lat:41.2961,lng:-82.2226,
+     cabinets:['Kitchen','Custodial Room 114 (Trauma Bag)']},
+  ];
+
+  // ===== BLUE-LIGHT EMERGENCY PHONE DATA =====
+  // Source: Oberlin Office of Safety & Security published emergency-phone list,
+  // recovered from the Internet Archive (web.archive.org snapshot of
+  // oberlin.edu/security/ephone-a.html). The live page now 404s, so this list is
+  // OFFICIAL but DATED — phones may have since been added, removed, or relocated.
+  // Marker positions are geocoded to the named landmark and are APPROXIMATE.
+  // Confidence reflects how well each entry could be independently geo-located.
+  var BP_SRC = 'https://web.archive.org/web/20060906020119/http://www.oberlin.edu/security/ephone-a.html';
+  var BP_ACCESS = 'Press the button to connect directly to Campus Safety; the blue light activates so responders can locate you.';
+  var BLUEPHONES = [
+    { id:'bp1', name:'Field House / Philips Lot', building:'Philips Athletic Facility / Field House', lat:41.2977, lng:-82.2230, confidence:'high',
+      detail:'Outdoor blue-light emergency phone in the Field House parking lot near the track, by the Philips Athletic Facility.', access:BP_ACCESS },
+    { id:'bp2', name:'Philips South Walkway', building:'Philips Athletic Facility (south walkway)', lat:41.2972, lng:-82.2233, confidence:'medium',
+      detail:'Outdoor blue-light phone on the south walkway by the Philips soccer scoreboard.', access:BP_ACCESS },
+    { id:'bp3', name:'Union Street Lot', building:'Union Street Parking Lot', lat:41.2978, lng:-82.2222, confidence:'medium',
+      detail:'Outdoor blue-light phone in the Union Street parking lot.', access:BP_ACCESS },
+    { id:'bp4', name:'Bailey–Burton Walkway', building:'Bailey (French House) / Burton Hall', lat:41.2972, lng:-82.2208, confidence:'medium',
+      detail:'Outdoor blue-light phone on the walkway between Bailey (French House) and Burton Hall.', access:BP_ACCESS },
+    { id:'bp5', name:'North Campus Quad', building:'North Campus Quad', lat:41.2966, lng:-82.2210, confidence:'high',
+      detail:'Outdoor blue-light phone in the North Campus Quad.', access:BP_ACCESS },
+    { id:'bp6', name:'Stevenson Lot (NE corner)', building:'Stevenson Hall / Dining', lat:41.2960, lng:-82.2191, confidence:'high',
+      detail:'Outdoor blue-light phone at the northeast corner of the Stevenson parking lot.', access:BP_ACCESS },
+    { id:'bp7', name:'Carnegie/Bosworth SW Yard', building:'Carnegie / Bosworth', lat:41.2947, lng:-82.2202, confidence:'medium',
+      detail:'Outdoor blue-light phone in the southwest yard of Carnegie / Bosworth.', access:BP_ACCESS },
+    { id:'bp8', name:'Carnegie/Bosworth NW Yard', building:'Carnegie / Bosworth', lat:41.2950, lng:-82.2203, confidence:'medium',
+      detail:'Outdoor blue-light phone in the northwest yard of Carnegie / Bosworth.', access:BP_ACCESS },
+    { id:'bp9', name:'Hales Parking Lot', building:'Hales Gymnasium', lat:41.2942, lng:-82.2241, confidence:'high',
+      detail:'Outdoor blue-light phone in the Hales (Gym) parking lot.', access:BP_ACCESS },
+    { id:'bp10', name:'Woodland St Lot (west)', building:'Woodland Street Parking Lot', lat:41.2945, lng:-82.2240, confidence:'medium',
+      detail:'Outdoor blue-light phone on the west side of the Woodland Street parking lot.', access:BP_ACCESS },
+    { id:'bp11', name:'Woodland St Lot (Women’s Center)', building:'Woodland Street Lot / Women’s Center', lat:41.2944, lng:-82.2238, confidence:'medium',
+      detail:'Outdoor blue-light phone in the Woodland Street lot near the Women’s Center.', access:BP_ACCESS },
+    { id:'bp12', name:'Kettering — Woodland & Lorain', building:'Kettering Hall (Science Center)', lat:41.2950, lng:-82.2223, confidence:'high',
+      detail:'Outdoor blue-light phone at Kettering Hall, corner of Woodland and Lorain Streets.', access:BP_ACCESS },
+    { id:'bp13', name:'Tappan Square (center)', building:'Tappan Square', lat:41.2927, lng:-82.2185, confidence:'high',
+      detail:'Outdoor blue-light phone near the center of Tappan Square.', access:BP_ACCESS },
+    { id:'bp14', name:'Allen Art Building (west)', building:'Allen Memorial Art Museum / Art Building', lat:41.2936, lng:-82.2163, confidence:'high',
+      detail:'Outdoor blue-light phone on the west side of the Allen Memorial Art Museum / Art Building.', access:BP_ACCESS },
+    { id:'bp15', name:'Willard Court', building:'Willard Court (Allen Art / Hall Auditorium)', lat:41.2932, lng:-82.2160, confidence:'high',
+      detail:'Outdoor blue-light phone in Willard Court, between the Allen Art Museum and Hall Auditorium.', access:BP_ACCESS },
+    { id:'bp16', name:'Tank Hall Front Yard', building:'Tank Hall (Tank Co-op)', lat:41.2921, lng:-82.2133, confidence:'high',
+      detail:'Outdoor blue-light phone in the Tank Hall front yard near East College Street (easternmost campus point).', access:BP_ACCESS },
+    { id:'bp17', name:'King Building (SE corner)', building:'King Building', lat:41.2922, lng:-82.2205, confidence:'high',
+      detail:'Outdoor blue-light phone at the southeast corner of King Building.', access:BP_ACCESS },
+    { id:'bp18', name:'Wilder Bowl', building:'Wilder Bowl / Warner Center', lat:41.2935, lng:-82.2218, confidence:'high',
+      detail:'Outdoor blue-light phone in Wilder Bowl, near Warner Center.', access:BP_ACCESS },
+    { id:'bp19', name:'Peters Hall (east side)', building:'Peters Hall', lat:41.2930, lng:-82.2205, confidence:'high',
+      detail:'Outdoor blue-light phone on the east side of Peters Hall.', access:BP_ACCESS },
+    { id:'bp20', name:'Peters Hall (west side)', building:'Peters Hall', lat:41.2930, lng:-82.2209, confidence:'high',
+      detail:'Outdoor blue-light phone on the west side of Peters Hall.', access:BP_ACCESS },
+    { id:'bp21', name:'Dascomb / Mudd Driveway', building:'Dascomb Hall / Mudd Library', lat:41.2924, lng:-82.2227, confidence:'high',
+      detail:'Outdoor blue-light phone in the Dascomb / Mudd driveway.', access:BP_ACCESS },
+    { id:'bp22', name:'Talcott / Harkness Bowl', building:'Talcott Hall / Harkness House', lat:41.2914, lng:-82.2212, confidence:'medium',
+      detail:'Outdoor blue-light phone in the Talcott / Harkness bowl.', access:BP_ACCESS },
+    { id:'bp23', name:'Grey Gables Lot', building:'Grey Gables (south campus)', lat:41.2903, lng:-82.2215, confidence:'low',
+      detail:'Outdoor blue-light phone in the Grey Gables parking lot (south campus).', access:BP_ACCESS },
+    { id:'bp24', name:'AJ Lewis Center (west walkway)', building:'Adam Joseph Lewis Center', lat:41.2908, lng:-82.2221, confidence:'high',
+      detail:'Outdoor blue-light phone on the west walkway of the Adam Joseph Lewis Center for Environmental Studies.', access:BP_ACCESS },
+    { id:'bp25', name:'Robertson / Conservatory Lot', building:'Robertson / Conservatory of Music', lat:41.2908, lng:-82.2192, confidence:'medium',
+      detail:'Outdoor blue-light phone in the Robertson / Conservatory parking lot.', access:BP_ACCESS },
+    { id:'bp26', name:'Harvey House (S. Professor St)', building:'Harvey House (Spanish House)', lat:41.2900, lng:-82.2212, confidence:'low',
+      detail:'Outdoor blue-light phone at Harvey House (Spanish House) along South Professor Street.', access:BP_ACCESS },
+    { id:'bp27', name:'South Hall / Fairchild Walkway', building:'South Hall / Fairchild House', lat:41.2897, lng:-82.2216, confidence:'medium',
+      detail:'Outdoor blue-light phone on the South Hall / Fairchild walkway.', access:BP_ACCESS },
+    { id:'bp28', name:'South Quadrangle', building:'South Quadrangle (Lord / Price Houses)', lat:41.2895, lng:-82.2210, confidence:'low',
+      detail:'Outdoor blue-light phone in the South Quadrangle, between Lord and Price Houses.', access:BP_ACCESS },
+    { id:'bp29', name:'Allencroft Lawn', building:'Allencroft (Russian House)', lat:41.2890, lng:-82.2212, confidence:'low',
+      detail:'Outdoor blue-light phone on the Allencroft (Russian House) lawn at South Professor Street.', access:BP_ACCESS },
+    { id:'bp30', name:'Johnson House Driveway', building:'Johnson House (Hebrew Heritage House)', lat:41.2888, lng:-82.2212, confidence:'low',
+      detail:'Outdoor blue-light phone in the Johnson House (Hebrew Heritage House) driveway (southernmost point).', access:BP_ACCESS },
+    { id:'bp31', name:'Peters Hall (interior phones)', building:'Peters Hall (interior)', lat:41.2930, lng:-82.2207, confidence:'high',
+      detail:'Indoor blue-light emergency phones inside Peters Hall — South Lobby, interior ground floor, 1st through 4th floors, and the Observatory. This single marker represents several interior units.',
+      access:'Located inside Peters Hall at the lobby, on each floor, and at the Observatory. Press the button to connect directly to Campus Safety.' },
+    { id:'bp32', name:'Facilities Maintenance Bldg', building:'Facilities Maintenance Building', lat:41.2918, lng:-82.2226, confidence:'medium',
+      detail:'Blue-light emergency phone at the east entrance of the Facilities Maintenance Building.',
+      access:'At the east entrance of the Facilities Maintenance Building. Press the button to connect directly to Campus Safety.' },
+  ];
+
+  // ===== ACCESSIBLE / DISABILITY PARKING DATA =====
+  // Oberlin College does NOT publish a campus-wide accessible-parking map, so this
+  // layer is sparse. Only the Finney Chapel lot is explicitly named for ADA parking
+  // (City of Oberlin). The other two are official visitor lots whose accessible
+  // status is INFERRED (state-mandated ADA spaces likely, but unconfirmed).
+  var ACCESSPARK = [
+    { id:'ap1', name:'Lot behind Finney Chapel', serves:'Finney Chapel and adjacent central-campus buildings', lat:41.2940, lng:-82.2211, confidence:'high', capacity:'',
+      detail:'The City of Oberlin states that ADA-needs parking is available in the lot behind Finney Chapel. This is the only public source that explicitly names an Oberlin lot for accessible parking. The number of ADA spaces is not stated.',
+      access:'Use the lot directly behind (north of) Finney Chapel, off N. Professor St.',
+      source:'https://cityofoberlin.com/officer-billie-neadham/parking/' },
+    { id:'ap2', name:'East Service Building Lot', serves:'General campus visitors (north-central campus)', lat:41.2960, lng:-82.2230, confidence:'low', capacity:'',
+      detail:'Inferred, not confirmed. Oberlin’s official Visitor Parking page names the east Service Building lot as the main visitor lot. As the primary visitor lot it likely contains state-mandated ADA spaces, but the page does not mention accessible spaces — so accessible status here is an inference only.',
+      access:'Use the main east Service Building visitor lot. Confirm ADA spaces with Campus Safety or the Office for Disability and Access before relying on it.',
+      source:'https://www.oberlin.edu/about-oberlin/visiting-oberlin/visitor-parking' },
+    { id:'ap3', name:'Carnegie Building Lot (south row)', serves:'Visitors to the Carnegie Building (admissions / financial aid)', lat:41.2948, lng:-82.2194, confidence:'low', capacity:'',
+      detail:'Inferred, not confirmed. The official Visitor Parking page names the south row of the Carnegie Building lot (52 W. Lorain St) for visitors to that building. Accessible status is not stated; this is an inference only.',
+      access:'Use the south row of the Carnegie Building lot (52 W. Lorain St). Confirm ADA spaces with Campus Safety or the Office for Disability and Access.',
+      source:'https://www.oberlin.edu/about-oberlin/visiting-oberlin/visitor-parking' },
+  ];
+
+  document.getElementById('statBldg').textContent = CAMPUS.length;
+  document.getElementById('statMp').textContent = MENSTRUAL.length;
+  document.getElementById('statAed').textContent = AEDS.length;
+  document.getElementById('statBp').textContent = BLUEPHONES.length;
+  document.getElementById('aedCountLabel').textContent = '(' + AEDS.length + ')';
+  document.getElementById('faCountLabel').textContent = '(' + FIRSTAID.length + ' buildings)';
+  document.getElementById('bpCountLabel').textContent = '(' + BLUEPHONES.length + ')';
+  document.getElementById('parkCountLabel').textContent = '(' + ACCESSPARK.length + ')';
+
+  // ===== TILE LAYERS =====
+  var tiles = {
+    standard: L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
+      attribution:'&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
+      subdomains:'abcd',maxZoom:20
+    }),
+    satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
+      attribution:'&copy; Esri, Maxar',maxZoom:19
+    })
+  };
+
+  var map = L.map('map',{center:OBERLIN,zoom:17,zoomControl:false});
+  var currentStyle = 'standard';
+  tiles.standard.addTo(map);
+
+  // ===== STATE =====
+  var leafletAedMarkers = [];
+  var leafletMpMarkers = [];
+  var leafletCampusMarkers = [];
+  var aedClusterGroup = null;
+  var mpClusterGroup = null;
+  var activeFilters = {aed:true, dispenser:true, vending:true, campus:true, dining:true, residence:true, firstaid:true, bluephone:true, parking:true};
+  var selectedId = null;
+  var editMode = false;
+  var editedItems = {};
+  var leafletFaMarkers = [];
+  var faClusterGroup = null;
+  var leafletBpMarkers = [];
+  var bpClusterGroup = null;
+  var leafletParkMarkers = [];
+
+  // ===== AED MARKERS =====
+  function addAedMarkers() {
+    if (aedClusterGroup) { map.removeLayer(aedClusterGroup); aedClusterGroup = null; }
+    leafletAedMarkers = [];
+    if (!activeFilters.aed) return;
+
+    aedClusterGroup = L.markerClusterGroup({
+      maxClusterRadius: 45,
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
+      disableClusteringAtZoom: 19,
+      animate: true,
+      animateAddingMarkers: false,
+      spiderfyDistanceMultiplier: 1.8,
+      iconCreateFunction: function(cluster) {
+        var count = cluster.getChildCount();
+        var sc = count <= 3 ? 'aed-cluster-small' : count <= 6 ? 'aed-cluster-medium' : 'aed-cluster-large';
+        return L.divIcon({
+          html: '<div class="aed-cluster '+sc+'"><div class="cluster-ring"></div>\u2764\uFE0F '+count+'</div>',
+          className: 'marker-cluster',
+          iconSize: L.point(count <= 3 ? 36 : count <= 6 ? 44 : 52, count <= 3 ? 36 : count <= 6 ? 44 : 52)
+        });
+      }
+    });
+
+    AEDS.forEach(function(aed) {
+      var icon = L.divIcon({
+        html:'<div class="aed-marker"><div class="pulse"></div>\u2764\uFE0F</div>',
+        className:'',iconSize:[30,36],iconAnchor:[15,36]
+      });
+      var m = L.marker([aed.lat,aed.lng],{icon:icon,zIndexOffset:700,draggable:editMode});
+      m.bindTooltip('<strong>\u2764\uFE0F AED</strong><br>'+aed.name+'<br><span style="font-size:10px;opacity:.6">'+aed.building+' \u2014 '+aed.floor+'</span>',{className:'custom-tooltip',direction:'top',offset:[0,-10]});
+      m.on('click', function(){if(m._justDragged){m._justDragged=false;return;}openAedPanel(aed);});
+      m._aedId = aed.id;
+      if(editMode){
+        m.on('dragstart',function(){m.closeTooltip();});
+        m.on('dragend',function(){var pos=m.getLatLng();aed.lat=pos.lat;aed.lng=pos.lng;m._justDragged=true;markEdited('aed',aed.id,aed.name,pos.lat,pos.lng);});
+      }
+      leafletAedMarkers.push(m);
+      aedClusterGroup.addLayer(m);
+    });
+    map.addLayer(aedClusterGroup);
+  }
+
+  // ===== MENSTRUAL PRODUCT MARKERS =====
+  function addMpMarkers() {
+    if (mpClusterGroup) { map.removeLayer(mpClusterGroup); mpClusterGroup = null; }
+    leafletMpMarkers.forEach(function(m){m.remove();});
+    leafletMpMarkers = [];
+
+    mpClusterGroup = L.markerClusterGroup({
+      maxClusterRadius: 35,
+      disableClusteringAtZoom: 18,
+      animate: true,
+      iconCreateFunction: function(cluster) {
+        var count = cluster.getChildCount();
+        var sc = count <= 4 ? 'mp-cluster-small' : 'mp-cluster-medium';
+        return L.divIcon({
+          html: '<div class="mp-cluster '+sc+'">\uD83E\uDE78 '+count+'</div>',
+          className: 'marker-cluster',
+          iconSize: L.point(count <= 4 ? 34 : 42, count <= 4 ? 34 : 42)
+        });
+      }
+    });
+
+    MENSTRUAL.forEach(function(mp) {
+      if (mp.type === 'dispenser' && !activeFilters.dispenser) return;
+      if (mp.type === 'vending' && !activeFilters.vending) return;
+
+      var markerHtml, markerSize, markerAnchor;
+      if (mp.type === 'vending') {
+        markerHtml = '<div class="vend-marker">\uD83C\uDFEA</div>';
+        markerSize = [28,33];
+        markerAnchor = [14,33];
+      } else {
+        markerHtml = '<div class="mp-marker"><div class="mp-pulse"></div>\uD83E\uDE78</div>';
+        markerSize = [28,33];
+        markerAnchor = [14,33];
+      }
+
+      var icon = L.divIcon({html:markerHtml,className:'',iconSize:markerSize,iconAnchor:markerAnchor});
+      var m = L.marker([mp.lat,mp.lng],{icon:icon,zIndexOffset:600,draggable:editMode});
+
+      var typeLabel = mp.type === 'vending' ? '\uD83C\uDFEA Health Vending Machine' : '\uD83E\uDE78 Free Dispenser (Aunt Flow)';
+      m.bindTooltip('<strong>'+typeLabel+'</strong><br>'+mp.name+'<br><span style="font-size:10px;opacity:.6">'+mp.building+' \u2014 '+mp.floor+'</span>',{className:'custom-tooltip',direction:'top',offset:[0,-10]});
+      m.on('click', function(){if(m._justDragged){m._justDragged=false;return;}openMpPanel(mp);});
+      m._mpId = mp.id;
+      if(editMode){
+        m.on('dragstart',function(){m.closeTooltip();});
+        m.on('dragend',function(){var pos=m.getLatLng();mp.lat=pos.lat;mp.lng=pos.lng;m._justDragged=true;markEdited('mp',mp.id,mp.name,pos.lat,pos.lng);});
+      }
+      leafletMpMarkers.push(m);
+      mpClusterGroup.addLayer(m);
+    });
+    map.addLayer(mpClusterGroup);
+  }
+
+  // ===== CAMPUS MARKERS =====
+  function addCampusMarkers() {
+    leafletCampusMarkers.forEach(function(m){m.remove();});
+    leafletCampusMarkers = [];
+    CAMPUS.forEach(function(b) {
+      var catLC = b.cat.toLowerCase();
+      if (catLC === 'dining' && !activeFilters.dining) return;
+      if (catLC === 'residence' && !activeFilters.residence) return;
+      if (catLC !== 'dining' && catLC !== 'residence' && !activeFilters.campus) return;
+      var icon = L.divIcon({
+        html:'<div class="campus-marker" style="background:'+b.color+';--mc:'+b.color+'">'+b.icon+'</div>',
+        className:'',iconSize:[24,29],iconAnchor:[12,29]
+      });
+      var m = L.marker([b.lat,b.lng],{icon:icon,zIndexOffset:400,draggable:editMode}).addTo(map);
+      m.bindTooltip('<strong>'+b.icon+' '+b.name+'</strong><br><span style="font-size:10px;opacity:.6">'+b.cat+'</span>',{className:'custom-tooltip',direction:'top',offset:[0,-8]});
+      m.on('click', function(){if(m._justDragged){m._justDragged=false;return;}openBuildingPanel(b);});
+      if(editMode){
+        m.on('dragstart',function(){m.closeTooltip();});
+        m.on('dragend',function(){var pos=m.getLatLng();b.lat=pos.lat;b.lng=pos.lng;m._justDragged=true;markEdited('campus',b.name,b.name,pos.lat,pos.lng);});
+      }
+      leafletCampusMarkers.push(m);
+    });
+  }
+
+  // ===== FIRST AID MARKERS =====
+  function addFaMarkers() {
+    if (faClusterGroup) { map.removeLayer(faClusterGroup); faClusterGroup = null; }
+    leafletFaMarkers = [];
+    if (!activeFilters.firstaid) return;
+
+    faClusterGroup = L.markerClusterGroup({
+      maxClusterRadius: 40,
+      disableClusteringAtZoom: 18,
+      animate: true,
+      iconCreateFunction: function(cluster) {
+        var count = cluster.getChildCount();
+        return L.divIcon({
+          html: '<div class="fa-cluster">🩹 '+count+'</div>',
+          className: 'marker-cluster',
+          iconSize: L.point(36, 36)
+        });
+      }
+    });
+
+    FIRSTAID.forEach(function(fa) {
+      var icon = L.divIcon({
+        html:'<div class="fa-marker">🩹</div>',
+        className:'',iconSize:[26,32],iconAnchor:[13,32]
+      });
+      var m = L.marker([fa.lat,fa.lng],{icon:icon,zIndexOffset:500,draggable:editMode});
+      m.bindTooltip('<strong>🩹 First Aid</strong><br>'+fa.building+'<br><span style="font-size:10px;opacity:.6">'+fa.cabinets.length+' cabinet'+(fa.cabinets.length>1?'s':'')+'</span>',{className:'custom-tooltip',direction:'top',offset:[0,-10]});
+      m.on('click', function(){if(m._justDragged){m._justDragged=false;return;}openFaPanel(fa);});
+      m._faId = fa.id;
+      if(editMode){
+        m.on('dragstart',function(){m.closeTooltip();});
+        m.on('dragend',function(){var pos=m.getLatLng();fa.lat=pos.lat;fa.lng=pos.lng;m._justDragged=true;markEdited('firstaid',fa.id,fa.building,pos.lat,pos.lng);});
+      }
+      leafletFaMarkers.push(m);
+      faClusterGroup.addLayer(m);
+    });
+    map.addLayer(faClusterGroup);
+  }
+
+  // ===== BLUE-LIGHT PHONE MARKERS =====
+  function addBpMarkers() {
+    if (bpClusterGroup) { map.removeLayer(bpClusterGroup); bpClusterGroup = null; }
+    leafletBpMarkers = [];
+    if (!activeFilters.bluephone) return;
+
+    bpClusterGroup = L.markerClusterGroup({
+      maxClusterRadius: 45,
+      disableClusteringAtZoom: 19,
+      showCoverageOnHover: false,
+      animate: true,
+      iconCreateFunction: function(cluster) {
+        var count = cluster.getChildCount();
+        return L.divIcon({
+          html: '<div class="bp-cluster">📞 '+count+'</div>',
+          className: 'marker-cluster',
+          iconSize: L.point(36, 36)
+        });
+      }
+    });
+
+    BLUEPHONES.forEach(function(bp) {
+      var icon = L.divIcon({
+        html:'<div class="bp-marker"><div class="bp-pulse"></div>📞</div>',
+        className:'',iconSize:[28,34],iconAnchor:[14,34]
+      });
+      var m = L.marker([bp.lat,bp.lng],{icon:icon,zIndexOffset:520,draggable:editMode});
+      m.bindTooltip('<strong>📞 Blue-Light Phone</strong><br>'+bp.name+'<br><span style="font-size:10px;opacity:.6">'+bp.building+'</span>',{className:'custom-tooltip',direction:'top',offset:[0,-10]});
+      m.on('click', function(){if(m._justDragged){m._justDragged=false;return;}openBpPanel(bp);});
+      m._bpId = bp.id;
+      if(editMode){
+        m.on('dragstart',function(){m.closeTooltip();});
+        m.on('dragend',function(){var pos=m.getLatLng();bp.lat=pos.lat;bp.lng=pos.lng;m._justDragged=true;markEdited('bluephone',bp.id,bp.name,pos.lat,pos.lng);});
+      }
+      leafletBpMarkers.push(m);
+      bpClusterGroup.addLayer(m);
+    });
+    map.addLayer(bpClusterGroup);
+  }
+
+  // ===== ACCESSIBLE PARKING MARKERS =====
+  function addParkMarkers() {
+    leafletParkMarkers.forEach(function(m){m.remove();});
+    leafletParkMarkers = [];
+    if (!activeFilters.parking) return;
+
+    ACCESSPARK.forEach(function(p) {
+      var icon = L.divIcon({
+        html:'<div class="park-marker">♿</div>',
+        className:'',iconSize:[28,34],iconAnchor:[14,34]
+      });
+      var m = L.marker([p.lat,p.lng],{icon:icon,zIndexOffset:510,draggable:editMode}).addTo(map);
+      m.bindTooltip('<strong>♿ Accessible Parking</strong><br>'+p.name+'<br><span style="font-size:10px;opacity:.6">Serves '+p.serves+'</span>',{className:'custom-tooltip',direction:'top',offset:[0,-10]});
+      m.on('click', function(){if(m._justDragged){m._justDragged=false;return;}openParkPanel(p);});
+      m._parkId = p.id;
+      if(editMode){
+        m.on('dragstart',function(){m.closeTooltip();});
+        m.on('dragend',function(){var pos=m.getLatLng();p.lat=pos.lat;p.lng=pos.lng;m._justDragged=true;markEdited('parking',p.id,p.name,pos.lat,pos.lng);});
+      }
+      leafletParkMarkers.push(m);
+    });
+  }
+
+  // ===== INFO PANELS =====
+  function openAedPanel(aed) {
+    selectedId = aed.id;
+    highlightCard(aed.id);
+    var panel = document.getElementById('infoPanel');
+    document.getElementById('ipIcon').style.background = 'rgba(208,48,48,.1)';
+    document.getElementById('ipIcon').innerHTML = '\u2764\uFE0F';
+    document.getElementById('ipTitle').textContent = aed.name;
+    document.getElementById('ipCat').textContent = aed.building + ' \u2014 ' + aed.floor;
+    document.getElementById('ipBody').innerHTML =
+      '<div class="ip-row"><div class="ip-row-icon">\uD83D\uDCCD</div><div class="ip-row-text"><strong>Location:</strong> '+aed.detail+'</div></div>'+
+      '<div class="ip-row"><div class="ip-row-icon">\uD83D\uDEAA</div><div class="ip-row-text"><strong>How to find:</strong> '+aed.access+'</div></div>'+
+      '<div class="ip-row"><div class="ip-row-icon">\u26A0\uFE0F</div><div class="ip-row-text"><span class="highlight hl-aed">In an emergency, call 911 first.</span> Then retrieve the AED. Open the case, power on, and follow voice prompts. AEDs are designed for use by anyone.</div></div>';
+    panel.classList.add('open');
+    map.setView([aed.lat,aed.lng],19,{animate:true});
+  }
+
+  function openMpPanel(mp) {
+    selectedId = mp.id;
+    highlightCard(mp.id);
+    var panel = document.getElementById('infoPanel');
+    var isVend = mp.type === 'vending';
+    document.getElementById('ipIcon').style.background = isVend ? 'rgba(58,138,122,.1)' : 'rgba(156,95,181,.1)';
+    document.getElementById('ipIcon').innerHTML = mp.icon;
+    document.getElementById('ipTitle').textContent = mp.name;
+    document.getElementById('ipCat').textContent = (isVend ? 'Health Vending Machine' : 'Free Aunt Flow Dispenser') + ' \u2014 ' + mp.building;
+    var html =
+      '<div class="ip-row"><div class="ip-row-icon">\uD83D\uDCCD</div><div class="ip-row-text"><strong>Location:</strong> '+mp.detail+'</div></div>'+
+      '<div class="ip-row"><div class="ip-row-icon">\uD83D\uDEAA</div><div class="ip-row-text"><strong>How to find:</strong> '+mp.access+'</div></div>'+
+      '<div class="ip-row"><div class="ip-row-icon">\uD83D\uDCE6</div><div class="ip-row-text"><strong>Products available:</strong> '+mp.products+'</div></div>'+
+      '<div class="ip-row"><div class="ip-row-icon">\uD83D\uDD04</div><div class="ip-row-text"><strong>Restocking:</strong> '+mp.restock+'</div></div>';
+    if (!isVend) {
+      html += '<div class="ip-row"><div class="ip-row-icon">\u2705</div><div class="ip-row-text"><span class="highlight hl-mp">These products are free!</span> Dispensed by Aunt Flow units installed by Student Health.</div></div>';
+    }
+    document.getElementById('ipBody').innerHTML = html;
+    panel.classList.add('open');
+    map.setView([mp.lat,mp.lng],19,{animate:true});
+  }
+
+  function openBuildingPanel(b) {
+    selectedId = null;
+    clearCardHighlights();
+    var panel = document.getElementById('infoPanel');
+    document.getElementById('ipIcon').style.background = b.color+'18';
+    document.getElementById('ipIcon').innerHTML = b.icon;
+    document.getElementById('ipTitle').textContent = b.name;
+    document.getElementById('ipCat').textContent = b.cat;
+
+    var html = '<div class="ip-row"><div class="ip-row-icon">\uD83C\uDFDB</div><div class="ip-row-text">'+b.desc+'</div></div>';
+
+    // Nearby AEDs
+    var nearbyAeds = AEDS.filter(function(a){
+      return Math.sqrt(Math.pow(a.lat-b.lat,2)+Math.pow(a.lng-b.lng,2)) < 0.002;
+    });
+    if (nearbyAeds.length) {
+      html += '<div class="ip-row"><div class="ip-row-icon">\u2764\uFE0F</div><div class="ip-row-text"><span class="highlight hl-aed">'+nearbyAeds.length+' AED'+(nearbyAeds.length>1?'s':'')+' nearby:</span><br>';
+      nearbyAeds.forEach(function(a){html += '\u2022 '+a.name+' ('+a.floor+')<br>';});
+      html += '</div></div>';
+    }
+
+    // Nearby menstrual products
+    var nearbyMp = MENSTRUAL.filter(function(mp){
+      return Math.sqrt(Math.pow(mp.lat-b.lat,2)+Math.pow(mp.lng-b.lng,2)) < 0.002;
+    });
+    if (nearbyMp.length) {
+      html += '<div class="ip-row"><div class="ip-row-icon">\uD83E\uDE78</div><div class="ip-row-text"><span class="highlight hl-mp">'+nearbyMp.length+' menstrual product location'+(nearbyMp.length>1?'s':'')+' nearby:</span><br>';
+      nearbyMp.forEach(function(mp){
+        var label = mp.type === 'vending' ? 'Vending' : 'Dispenser';
+        html += '\u2022 '+mp.name+' ('+label+', '+mp.floor+')<br>';
+      });
+      html += '</div></div>';
+    }
+
+    if (!nearbyAeds.length && !nearbyMp.length) {
+      html += '<div class="ip-row"><div class="ip-row-icon">\u2139\uFE0F</div><div class="ip-row-text">No AEDs or menstrual product locations currently mapped in this building.</div></div>';
+    }
+
+    document.getElementById('ipBody').innerHTML = html;
+    panel.classList.add('open');
+  }
+
+  function openFaPanel(fa) {
+    selectedId = fa.id;
+    highlightCard(fa.id);
+    var panel = document.getElementById('infoPanel');
+    document.getElementById('ipIcon').style.background = 'rgba(45,138,90,.1)';
+    document.getElementById('ipIcon').innerHTML = '🩹';
+    document.getElementById('ipTitle').textContent = fa.building;
+    document.getElementById('ipCat').textContent = 'First Aid — ' + fa.cabinets.length + ' cabinet' + (fa.cabinets.length > 1 ? 's' : '');
+    var html = '<div class="ip-row"><div class="ip-row-icon">📋</div><div class="ip-row-text"><strong>Cabinet locations in this building:</strong></div></div>';
+    fa.cabinets.forEach(function(c) {
+      html += '<div class="ip-row"><div class="ip-row-icon" style="color:var(--firstaid)">🩹</div><div class="ip-row-text">'+c+'</div></div>';
+    });
+    document.getElementById('ipBody').innerHTML = html;
+    panel.classList.add('open');
+    map.setView([fa.lat,fa.lng],19,{animate:true});
+  }
+
+  function confBadge(conf) {
+    var label = conf === 'high' ? 'High confidence' : conf === 'medium' ? 'Approximate location' : 'Low confidence — approximate';
+    return '<span class="conf-badge conf-'+conf+'">'+label+'</span>';
+  }
+
+  function openBpPanel(bp) {
+    selectedId = bp.id;
+    highlightCard(bp.id);
+    var panel = document.getElementById('infoPanel');
+    document.getElementById('ipIcon').style.background = 'rgba(21,101,216,.1)';
+    document.getElementById('ipIcon').innerHTML = '📞';
+    document.getElementById('ipTitle').textContent = bp.name;
+    document.getElementById('ipCat').textContent = 'Blue-Light Emergency Phone — ' + bp.building;
+    document.getElementById('ipBody').innerHTML =
+      '<div class="ip-row"><div class="ip-row-icon">📍</div><div class="ip-row-text"><strong>Location:</strong> '+bp.detail+'</div></div>'+
+      '<div class="ip-row"><div class="ip-row-icon">🆘</div><div class="ip-row-text"><strong>How to use:</strong> '+bp.access+'</div></div>'+
+      '<div class="ip-row"><div class="ip-row-icon">🎯</div><div class="ip-row-text">'+confBadge(bp.confidence)+'</div></div>'+
+      '<div class="ip-row"><div class="ip-row-icon">ℹ️</div><div class="ip-row-text">Marker position is approximate, geocoded from Oberlin Campus Safety’s published emergency-phone list (<a href="'+BP_SRC+'" target="_blank" style="color:var(--bluephone)">archived</a>). The list is dated, so some phones may have changed. In any emergency you can also call <strong>911</strong> or use the <strong>ObieAlert</strong> app’s Mobile Blue Light feature.</div></div>';
+    panel.classList.add('open');
+    map.setView([bp.lat,bp.lng],19,{animate:true});
+  }
+
+  function openParkPanel(p) {
+    selectedId = p.id;
+    highlightCard(p.id);
+    var panel = document.getElementById('infoPanel');
+    var conf = p.confidence;
+    var confLabel = conf === 'high' ? 'Confirmed by official source' : conf === 'medium' ? 'Approximate' : 'Unconfirmed — inferred';
+    document.getElementById('ipIcon').style.background = 'rgba(57,73,171,.1)';
+    document.getElementById('ipIcon').innerHTML = '♿';
+    document.getElementById('ipTitle').textContent = p.name;
+    document.getElementById('ipCat').textContent = 'Accessible Parking — serves ' + p.serves;
+    var html =
+      '<div class="ip-row"><div class="ip-row-icon">♿</div><div class="ip-row-text"><strong>Details:</strong> '+p.detail+'</div></div>'+
+      '<div class="ip-row"><div class="ip-row-icon">🚶</div><div class="ip-row-text"><strong>Access:</strong> '+p.access+'</div></div>';
+    if (p.capacity) html += '<div class="ip-row"><div class="ip-row-icon">🅿️</div><div class="ip-row-text"><strong>Accessible spaces:</strong> '+p.capacity+'</div></div>';
+    html += '<div class="ip-row"><div class="ip-row-icon">🎯</div><div class="ip-row-text"><span class="conf-badge conf-'+conf+'">'+confLabel+'</span></div></div>';
+    html += '<div class="ip-row"><div class="ip-row-icon">ℹ️</div><div class="ip-row-text">Oberlin does not publish a full accessible-parking map. To confirm ADA spaces, contact the <strong>Office for Disability and Access</strong> (Wilder Hall Rm 112, 440-775-5588, ODA@oberlin.edu) or Campus Safety (csafety@oberlin.edu).</div></div>';
+    document.getElementById('ipBody').innerHTML = html;
+    panel.classList.add('open');
+    map.setView([p.lat,p.lng],19,{animate:true});
+  }
+
+  function closeInfoPanel() {
+    document.getElementById('infoPanel').classList.remove('open');
+    selectedId = null;
+    clearCardHighlights();
+  }
+
+  // ===== EDIT MODE =====
+  function toggleEditMode() {
+    editMode = !editMode;
+    document.getElementById('btnEditMode').classList.toggle('edit-active', editMode);
+    document.getElementById('editPanel').classList.toggle('open', editMode);
+    applyFilters();
+  }
+
+  function markEdited(type, id, name, lat, lng) {
+    editedItems[id] = {type:type, id:id, name:name, lat:lat, lng:lng};
+    renderEditPanel();
+  }
+
+  function renderEditPanel() {
+    var ids = Object.keys(editedItems);
+    var el = document.getElementById('editChanges');
+    if (!ids.length) {
+      el.innerHTML = '<div class="edit-no-changes">No changes yet — drag a marker to start.</div>';
+      return;
+    }
+    var html = '';
+    ids.forEach(function(id) {
+      var item = editedItems[id];
+      html += '<div class="edit-change-row"><span class="ec-name" title="'+item.name+'">'+item.name+'</span><span class="ec-coords">'+item.lat.toFixed(5)+', '+item.lng.toFixed(5)+'</span></div>';
+    });
+    el.innerHTML = html;
+  }
+
+  function exportChanges() {
+    var lines = [];
+    Object.keys(editedItems).forEach(function(id) {
+      var item = editedItems[id];
+      var typeLabel = item.type === 'aed' ? 'AED' : item.type === 'mp' ? 'Product' : item.type === 'firstaid' ? 'First Aid' : item.type === 'bluephone' ? 'Blue Phone' : item.type === 'parking' ? 'Parking' : 'Building';
+      lines.push(typeLabel+' "'+item.name+'":\n  lat: '+item.lat.toFixed(6)+',\n  lng: '+item.lng.toFixed(6));
+    });
+    var text = lines.join('\n\n');
+    var btn = document.getElementById('btnExportChanges');
+    navigator.clipboard.writeText(text).then(function() {
+      btn.textContent = 'Copied!';
+      setTimeout(function(){btn.textContent = 'Copy Coords';}, 2000);
+    }).catch(function() {
+      prompt('Copy updated coordinates:', text);
+    });
+  }
+
+  // ===== SIDEBAR LISTS =====
+  function renderAedList() {
+    var el = document.getElementById('aedList');
+    var html = '';
+    var groups = {};
+    AEDS.forEach(function(a){
+      if (!groups[a.building]) groups[a.building] = [];
+      groups[a.building].push(a);
+    });
+    for (var bldg in groups) {
+      html += '<div class="group-label">'+bldg+'</div>';
+      groups[bldg].forEach(function(a){
+        html += '<div class="card" data-id="'+a.id+'">' +
+          '<div class="card-icon" style="background:rgba(208,48,48,.08)">\u2764\uFE0F</div>' +
+          '<div class="card-body"><div class="card-title">'+a.name+'</div>' +
+          '<div class="card-sub">'+a.detail.substring(0,65)+'\u2026</div></div>' +
+          '<div class="card-badge">'+a.floor+'</div></div>';
+      });
+    }
+    el.innerHTML = html;
+    el.querySelectorAll('.card').forEach(function(card){
+      card.addEventListener('click', function(){
+        var id = this.getAttribute('data-id');
+        var aed = AEDS.find(function(a){return a.id===id;});
+        if (aed) openAedPanel(aed);
+      });
+    });
+  }
+
+  function renderMpList() {
+    var el = document.getElementById('mpList');
+    var dispensers = MENSTRUAL.filter(function(m){return m.type==='dispenser';});
+    var vending = MENSTRUAL.filter(function(m){return m.type==='vending';});
+
+    var html = '<div class="group-label">\uD83E\uDE78 Free Aunt Flow Dispensers ('+dispensers.length+')</div>';
+    dispensers.forEach(function(mp){
+      html += '<div class="card" data-id="'+mp.id+'">' +
+        '<div class="card-icon" style="background:rgba(156,95,181,.08)">\uD83E\uDE78</div>' +
+        '<div class="card-body"><div class="card-title">'+mp.name+'</div>' +
+        '<div class="card-sub">'+mp.building+' \u2014 Free pads & tampons</div></div>' +
+        '<div class="card-badge">'+mp.floor+'</div></div>';
+    });
+
+    html += '<div class="group-label">\uD83C\uDFEA Health Vending Machines ('+vending.length+')</div>';
+    vending.forEach(function(mp){
+      html += '<div class="card" data-id="'+mp.id+'">' +
+        '<div class="card-icon" style="background:rgba(58,138,122,.08)">\uD83C\uDFEA</div>' +
+        '<div class="card-body"><div class="card-title">'+mp.name+'</div>' +
+        '<div class="card-sub">'+mp.building+' \u2014 Pads, tampons, test strips & more</div></div>' +
+        '<div class="card-badge">'+mp.floor+'</div></div>';
+    });
+
+    el.innerHTML = html;
+    el.querySelectorAll('.card').forEach(function(card){
+      card.addEventListener('click', function(){
+        var id = this.getAttribute('data-id');
+        var mp = MENSTRUAL.find(function(m){return m.id===id;});
+        if (mp) openMpPanel(mp);
+      });
+    });
+  }
+
+  function renderBldgList() {
+    var el = document.getElementById('bldgList');
+    var cats = {};
+    CAMPUS.forEach(function(b){
+      if (!cats[b.cat]) cats[b.cat] = [];
+      cats[b.cat].push(b);
+    });
+    var html = '';
+    var order = ['Academic','Conservatory','Library','Arts','Athletics','Dining','Residence','Student Life','Landmark','Admin','Safety','Other'];
+    order.forEach(function(cat){
+      if (!cats[cat]) return;
+      html += '<div class="group-label">'+cat+' ('+cats[cat].length+')</div>';
+      cats[cat].forEach(function(b){
+        html += '<div class="card" data-bldg="'+b.name+'">' +
+          '<div class="card-icon" style="background:'+b.color+'14">'+b.icon+'</div>' +
+          '<div class="card-body"><div class="card-title">'+b.name+'</div>' +
+          '<div class="card-sub">'+b.desc.substring(0,65)+'\u2026</div></div></div>';
+      });
+    });
+    el.innerHTML = html;
+    el.querySelectorAll('.card').forEach(function(card){
+      card.addEventListener('click', function(){
+        var name = this.getAttribute('data-bldg');
+        var b = CAMPUS.find(function(c){return c.name===name;});
+        if (b) { openBuildingPanel(b); map.setView([b.lat,b.lng],19,{animate:true}); }
+      });
+    });
+  }
+
+  function renderFaList() {
+    var el = document.getElementById('faList');
+    var html = '';
+    FIRSTAID.forEach(function(fa) {
+      html += '<div class="card" data-id="'+fa.id+'">' +
+        '<div class="card-icon" style="background:rgba(45,138,90,.08)">🩹</div>' +
+        '<div class="card-body"><div class="card-title">'+fa.building+'</div>' +
+        '<div class="card-sub">'+fa.cabinets.length+' cabinet'+(fa.cabinets.length>1?'s':'')+' — '+fa.cabinets[0]+'</div></div></div>';
+    });
+    el.innerHTML = html;
+    el.querySelectorAll('.card').forEach(function(card) {
+      card.addEventListener('click', function() {
+        var id = this.getAttribute('data-id');
+        var fa = FIRSTAID.find(function(f){return f.id===id;});
+        if (fa) openFaPanel(fa);
+      });
+    });
+  }
+
+  function renderBpList() {
+    var el = document.getElementById('bpList');
+    var html = '<div class="group-label">From Oberlin Campus Safety’s published list (archived) — positions approximate</div>';
+    BLUEPHONES.forEach(function(bp) {
+      html += '<div class="card" data-id="'+bp.id+'">' +
+        '<div class="card-icon" style="background:rgba(21,101,216,.08)">📞</div>' +
+        '<div class="card-body"><div class="card-title">'+bp.name+'</div>' +
+        '<div class="card-sub">'+bp.building+'</div></div>' +
+        '<div class="card-badge conf-'+bp.confidence+'">'+bp.confidence+'</div></div>';
+    });
+    el.innerHTML = html;
+    el.querySelectorAll('.card').forEach(function(card) {
+      card.addEventListener('click', function() {
+        var id = this.getAttribute('data-id');
+        var bp = BLUEPHONES.find(function(x){return x.id===id;});
+        if (bp) openBpPanel(bp);
+      });
+    });
+  }
+
+  function renderParkList() {
+    var el = document.getElementById('parkList');
+    var html = '<div class="group-label">Oberlin publishes no full ADA-parking map — only the Finney lot is confirmed</div>';
+    ACCESSPARK.forEach(function(p) {
+      html += '<div class="card" data-id="'+p.id+'">' +
+        '<div class="card-icon" style="background:rgba(57,73,171,.08)">♿</div>' +
+        '<div class="card-body"><div class="card-title">'+p.name+'</div>' +
+        '<div class="card-sub">Serves '+p.serves.substring(0,58)+(p.serves.length>58?'…':'')+'</div></div>' +
+        '<div class="card-badge conf-'+p.confidence+'">'+p.confidence+'</div></div>';
+    });
+    el.innerHTML = html;
+    el.querySelectorAll('.card').forEach(function(card) {
+      card.addEventListener('click', function() {
+        var id = this.getAttribute('data-id');
+        var p = ACCESSPARK.find(function(x){return x.id===id;});
+        if (p) openParkPanel(p);
+      });
+    });
+  }
+
+  function highlightCard(id) {
+    clearCardHighlights();
+    document.querySelectorAll('.card[data-id="'+id+'"]').forEach(function(c){
+      c.classList.add('active');
+      c.classList.add('active-mp');
+    });
+  }
+  function clearCardHighlights() {
+    document.querySelectorAll('.card').forEach(function(c){c.classList.remove('active');c.classList.remove('active-mp');});
+  }
+
+  // ===== TABS =====
+  document.querySelectorAll('.tab-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+      this.classList.add('active');
+      var tab = this.getAttribute('data-tab');
+      document.querySelectorAll('.list-panel').forEach(function(p){p.classList.remove('active');});
+      document.getElementById('panel-'+tab).classList.add('active');
+    });
+  });
+
+  // ===== FILTERS =====
+  function applyFilters() {
+    addAedMarkers();
+    addMpMarkers();
+    addCampusMarkers();
+    addFaMarkers();
+    addBpMarkers();
+    addParkMarkers();
+  }
+
+  document.querySelectorAll('.filter-chip').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      var f = this.getAttribute('data-filter');
+      activeFilters[f] = !activeFilters[f];
+      this.classList.toggle('active', activeFilters[f]);
+      applyFilters();
+    });
+  });
+
+  // ===== MAP STYLE =====
+  function setMapStyle(s) {
+    if (tiles[currentStyle]) tiles[currentStyle].remove();
+    if (tiles[s]) tiles[s].addTo(map);
+    currentStyle = s;
+    document.querySelectorAll('.style-chip').forEach(function(c){
+      c.classList.toggle('active',c.getAttribute('data-style')===s);
+    });
+  }
+
+  // ===== SEARCH =====
+  var activeResultIdx = -1;
+  function fuzzyMatch(q,t){q=q.toLowerCase();t=t.toLowerCase();if(t===q)return 100;if(t.indexOf(q)===0)return 90;if(t.indexOf(q)!==-1)return 70;var ws=q.split(/\s+/),ok=true,sc=0;for(var i=0;i<ws.length;i++){if(!ws[i].length)continue;var idx=t.indexOf(ws[i]);if(idx===-1){ok=false;break;}sc+=(idx===0)?15:10;}if(ok&&ws.length>0)return 40+sc;return 0;}
+  function highlightMatch(text,query){var q=query.toLowerCase(),tL=text.toLowerCase(),idx=tL.indexOf(q);if(idx!==-1)return text.substring(0,idx)+'<mark>'+text.substring(idx,idx+q.length)+'</mark>'+text.substring(idx+q.length);return text;}
+
+  function doSearch(query){
+    var dd=document.getElementById('searchDropdown');
+    if(!query||query.length<1){dd.classList.remove('open');return;}
+    var results=[];
+
+    // Search AEDs
+    AEDS.forEach(function(a){
+      var sc=Math.max(fuzzyMatch(query,a.name),fuzzyMatch(query,a.building)*0.7);
+      if(sc>0)results.push({name:a.name,cat:'AED \u2014 '+a.building,icon:'\u2764\uFE0F',lat:a.lat,lng:a.lng,score:sc,aed:a});
+    });
+
+    // Search menstrual products
+    MENSTRUAL.forEach(function(mp){
+      var searchStr = mp.name + ' ' + mp.building + ' ' + (mp.type==='vending'?'vending machine health':'dispenser aunt flow menstrual pads tampons free');
+      var sc=Math.max(fuzzyMatch(query,mp.name),fuzzyMatch(query,mp.building)*0.7,fuzzyMatch(query,searchStr)*0.5);
+      if(sc>0){
+        var catLabel = mp.type==='vending' ? 'Health Vending' : 'Free Dispenser';
+        results.push({name:mp.name,cat:catLabel+' \u2014 '+mp.building,icon:mp.icon,lat:mp.lat,lng:mp.lng,score:sc,mp:mp});
+      }
+    });
+
+    // Search first aid
+    FIRSTAID.forEach(function(fa){
+      var sc=fuzzyMatch(query,fa.building);
+      if(sc>0)results.push({name:fa.building,cat:'First Aid Cabinet',icon:'🩹',lat:fa.lat,lng:fa.lng,score:sc,fa:fa});
+    });
+
+    // Search blue-light phones
+    BLUEPHONES.forEach(function(bp){
+      var sc=Math.max(fuzzyMatch(query,bp.name),fuzzyMatch(query,bp.building)*0.7,fuzzyMatch(query,'blue light emergency phone')*0.4);
+      if(sc>0)results.push({name:bp.name,cat:'Blue-Light Phone',icon:'📞',lat:bp.lat,lng:bp.lng,score:sc,bp:bp});
+    });
+
+    // Search accessible parking
+    ACCESSPARK.forEach(function(p){
+      var sc=Math.max(fuzzyMatch(query,p.name),fuzzyMatch(query,p.serves)*0.6,fuzzyMatch(query,'accessible disability handicap ada wheelchair parking')*0.4);
+      if(sc>0)results.push({name:p.name,cat:'Accessible Parking',icon:'♿',lat:p.lat,lng:p.lng,score:sc,park:p});
+    });
+
+    // Search buildings
+    CAMPUS.forEach(function(b){
+      var sc=Math.max(fuzzyMatch(query,b.name),fuzzyMatch(query,b.cat)*0.5);
+      if(sc>0)results.push({name:b.name,cat:b.cat,icon:b.icon,lat:b.lat,lng:b.lng,score:sc,bldg:b});
+    });
+
+    results.sort(function(a,b){return b.score-a.score;});
+    results=results.slice(0,14);
+    if(!results.length){dd.innerHTML='<div class="sr-empty">No results for \u201C'+query+'\u201D</div>';dd.classList.add('open');return;}
+    var html='',lastCat='';
+    results.forEach(function(r,i){
+      if(r.cat!==lastCat){html+='<div class="sr-group-label">'+r.cat+'</div>';lastCat=r.cat;}
+      html+='<div class="sr-item" data-idx="'+i+'"><div class="sr-icon">'+r.icon+'</div><div class="sr-name">'+highlightMatch(r.name,query)+'</div><div class="sr-cat">'+r.cat.split('\u2014')[0].trim()+'</div></div>';
+    });
+    dd.innerHTML=html;dd.classList.add('open');activeResultIdx=-1;
+    dd.querySelectorAll('.sr-item').forEach(function(item,i){
+      item.addEventListener('click',function(){
+        var r=results[i];
+        if(r.aed)openAedPanel(r.aed);
+        else if(r.mp)openMpPanel(r.mp);
+        else if(r.fa)openFaPanel(r.fa);
+        else if(r.bp)openBpPanel(r.bp);
+        else if(r.park)openParkPanel(r.park);
+        else if(r.bldg)openBuildingPanel(r.bldg);
+        map.setView([r.lat,r.lng],19,{animate:true});
+        dd.classList.remove('open');document.getElementById('searchInput').value='';
+      });
+    });
+  }
+
+  // ===== EVENT LISTENERS =====
+  document.querySelectorAll('.style-chip').forEach(function(c){
+    c.addEventListener('click',function(){setMapStyle(this.getAttribute('data-style'));});
+  });
+
+  document.getElementById('btnZoomIn').addEventListener('click',function(){map.zoomIn();});
+  document.getElementById('btnZoomOut').addEventListener('click',function(){map.zoomOut();});
+  document.getElementById('btnReset').addEventListener('click',function(){map.setView(OBERLIN,17,{animate:true});});
+  document.getElementById('infoPanelClose').addEventListener('click',closeInfoPanel);
+  document.getElementById('btnEditMode').addEventListener('click',toggleEditMode);
+  document.getElementById('btnExitEdit').addEventListener('click',toggleEditMode);
+  document.getElementById('btnExportChanges').addEventListener('click',exportChanges);
+
+  // Legend toggle
+  var legendOpen = true;
+  document.getElementById('legendToggle').addEventListener('click',function(){
+    legendOpen = !legendOpen;
+    document.getElementById('legendBody').style.maxHeight = legendOpen ? '200px' : '0';
+    this.textContent = legendOpen ? '\u25B2' : '\u25BC';
+  });
+
+  document.getElementById('btnSearch').addEventListener('click',function(){doSearch(document.getElementById('searchInput').value.trim());});
+  document.getElementById('searchInput').addEventListener('input',function(){doSearch(this.value.trim());});
+  document.getElementById('searchInput').addEventListener('keydown',function(e){
+    var items=document.getElementById('searchDropdown').querySelectorAll('.sr-item');
+    if(e.key==='ArrowDown'){e.preventDefault();activeResultIdx=Math.min(activeResultIdx+1,items.length-1);items.forEach(function(it,i){it.classList.toggle('active',i===activeResultIdx);});}
+    else if(e.key==='ArrowUp'){e.preventDefault();activeResultIdx=Math.max(activeResultIdx-1,0);items.forEach(function(it,i){it.classList.toggle('active',i===activeResultIdx);});}
+    else if(e.key==='Enter'){e.preventDefault();if(activeResultIdx>=0&&items[activeResultIdx])items[activeResultIdx].click();else doSearch(this.value.trim());}
+    else if(e.key==='Escape'){document.getElementById('searchDropdown').classList.remove('open');this.blur();}
+  });
+  document.addEventListener('click',function(e){if(!document.getElementById('searchBox').contains(e.target))document.getElementById('searchDropdown').classList.remove('open');});
+
+  // Close info panel on map click
+  map.on('click', function(e){
+    if (!e.originalEvent.target.closest('.info-panel') && !e.originalEvent.target.closest('.aed-marker') && !e.originalEvent.target.closest('.mp-marker') && !e.originalEvent.target.closest('.vend-marker') && !e.originalEvent.target.closest('.campus-marker') && !e.originalEvent.target.closest('.bp-marker') && !e.originalEvent.target.closest('.park-marker')) {
+      closeInfoPanel();
+    }
+  });
+
+  // ===== INIT =====
+  renderAedList();
+  renderMpList();
+  renderBldgList();
+  renderFaList();
+  renderBpList();
+  renderParkList();
+  addAedMarkers();
+  addMpMarkers();
+  addCampusMarkers();
+  addFaMarkers();
+  addBpMarkers();
+  addParkMarkers();
+
+}); // end window.onload
+</script>
+</body>
+</html>

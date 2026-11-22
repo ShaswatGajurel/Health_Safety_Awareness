@@ -1,0 +1,354 @@
+[
+  {
+    "building": "South Hall",
+    "building_number": 12,
+    "lat": 41.2897, "lng": -82.2216,
+    "cabinets": [
+      {"cabinet_num": "16", "location": "2nd Floor Kitchen", "week": 2},
+      {"cabinet_num": "17", "location": "Basement Custodial Office", "week": 2},
+      {"cabinet_num": "18", "location": "Main Downstairs Kitchen (Bake Shop)", "week": 2}
+    ]
+  },
+  {
+    "building": "Baldwin Cottage",
+    "building_number": 23,
+    "lat": 41.2917, "lng": -82.2215,
+    "cabinets": [
+      {"cabinet_num": "3", "location": "Kitchen", "week": 2}
+    ]
+  },
+  {
+    "building": "Talcott Hall",
+    "building_number": 24,
+    "lat": 41.2913, "lng": -82.2207,
+    "cabinets": [
+      {"cabinet_num": "4", "location": "Talcott-Kosher Co-op Kitchen", "week": 2},
+      {"cabinet_num": "72", "location": "2nd Floor Kitchen", "week": 2}
+    ]
+  },
+  {
+    "building": "Harkness Co-op",
+    "building_number": 25,
+    "lat": 41.2913, "lng": -82.2217,
+    "cabinets": [
+      {"cabinet_num": "15", "location": "Basement Kitchen", "week": 2}
+    ]
+  },
+  {
+    "building": "Dascomb",
+    "building_number": 26,
+    "lat": 41.2918, "lng": -82.2224,
+    "cabinets": [
+      {"cabinet_num": "26", "location": "Main Floor Kitchen", "week": 4},
+      {"cabinet_num": "27", "location": "2nd Floor Kitchen", "week": 4}
+    ]
+  },
+  {
+    "building": "Rice Hall",
+    "building_number": 27,
+    "lat": 41.2924, "lng": -82.2211,
+    "cabinets": [
+      {"cabinet_num": "14", "location": "1st Floor Lounge", "week": 4}
+    ]
+  },
+  {
+    "building": "King Building",
+    "building_number": 28,
+    "lat": 41.2923, "lng": -82.2207,
+    "cabinets": [
+      {"cabinet_num": "13", "location": "Basement Custodial", "week": 4}
+    ]
+  },
+  {
+    "building": "Peters Hall",
+    "building_number": 30,
+    "lat": 41.2930, "lng": -82.2207,
+    "cabinets": [
+      {"cabinet_num": "90", "location": "3rd Floor Office", "week": 4},
+      {"cabinet_num": "91", "location": "Room 205", "week": 4},
+      {"cabinet_num": "unknown", "location": "Room 118", "week": 4}
+    ]
+  },
+  {
+    "building": "Cox Administration Building",
+    "building_number": 31,
+    "lat": 41.2934, "lng": -82.2207,
+    "cabinets": [
+      {"cabinet_num": "42", "location": "Administration", "week": 4}
+    ]
+  },
+  {
+    "building": "Finney Chapel",
+    "building_number": 32,
+    "lat": 41.2938, "lng": -82.2207,
+    "cabinets": [
+      {"cabinet_num": "115", "location": "Chapel", "week": 4}
+    ]
+  },
+  {
+    "building": "Warner Center",
+    "building_number": 33,
+    "lat": 41.2934, "lng": -82.2216,
+    "cabinets": [
+      {"cabinet_num": "92", "location": "Room 100 Drawer", "week": 4},
+      {"cabinet_num": "119", "location": "2nd Floor", "week": 4},
+      {"cabinet_num": "120", "location": "1st Floor Ticket Booth", "week": 4}
+    ]
+  },
+  {
+    "building": "Mudd Center / Main Library",
+    "building_number": 34,
+    "lat": 41.2931, "lng": -82.2229,
+    "cabinets": [
+      {"cabinet_num": "88", "location": "Behind Front Desk", "week": 5},
+      {"cabinet_num": "89", "location": "Basement CIT", "week": 5},
+      {"cabinet_num": "200", "location": "Basement — Bill's Trauma Box", "week": 5}
+    ]
+  },
+  {
+    "building": "Wilder Hall (Student Union)",
+    "building_number": 35,
+    "lat": 41.2938, "lng": -82.2222,
+    "cabinets": [
+      {"cabinet_num": "93", "location": "Kitchen", "week": 5},
+      {"cabinet_num": "94", "location": "Front Desk", "week": 5},
+      {"cabinet_num": "100", "location": "Disco Area", "week": 5},
+      {"cabinet_num": "116", "location": "Room 111", "week": 5},
+      {"cabinet_num": "117", "location": "Mail Room", "week": 5},
+      {"cabinet_num": "200", "location": "Room 105", "week": 5}
+    ]
+  },
+  {
+    "building": "Campus Safety / Security Building",
+    "building_number": 38,
+    "lat": 41.2918, "lng": -82.2226,
+    "cabinets": [
+      {"cabinet_num": "unknown", "location": "Safety & Security Tackle Boxes", "week": 5},
+      {"cabinet_num": "66", "location": "Security Building", "week": 5}
+    ]
+  },
+  {
+    "building": "Hales Gymnasium",
+    "building_number": 40,
+    "lat": 41.2942, "lng": -82.2241,
+    "cabinets": [
+      {"cabinet_num": "168", "location": "Hales", "week": 6},
+      {"cabinet_num": "176", "location": "Cat in the Cream", "week": 6},
+      {"cabinet_num": "55", "location": "Gym", "week": 6}
+    ]
+  },
+  {
+    "building": "Philips Physical Ed Center",
+    "building_number": 46,
+    "lat": 41.2977, "lng": -82.2230,
+    "cabinets": [
+      {"cabinet_num": "68", "location": "Front Desk", "week": 6},
+      {"cabinet_num": "70", "location": "Equipment Room", "week": 6},
+      {"cabinet_num": "71", "location": "Pool Office", "week": 6},
+      {"cabinet_num": "69", "location": "Heisman Field House", "week": 6}
+    ]
+  },
+  {
+    "building": "Langston Hall",
+    "building_number": 53,
+    "lat": 41.2978, "lng": -82.2210,
+    "cabinets": [
+      {"cabinet_num": "24", "location": "2nd Floor Kitchen", "week": 7},
+      {"cabinet_num": "25", "location": "Custodial Office", "week": 7},
+      {"cabinet_num": "121", "location": "1st Floor Kitchenette", "week": 7}
+    ]
+  },
+  {
+    "building": "Burton Hall",
+    "building_number": 55,
+    "lat": 41.2972, "lng": -82.2210,
+    "cabinets": [
+      {"cabinet_num": "23", "location": "Basement Custodial", "week": 7},
+      {"cabinet_num": "112", "location": "2nd Floor Kitchen", "week": 7}
+    ]
+  },
+  {
+    "building": "Noah Hall",
+    "building_number": 57,
+    "lat": 41.2966, "lng": -82.2219,
+    "cabinets": [
+      {"cabinet_num": "43", "location": "Kitchen", "week": 7}
+    ]
+  },
+  {
+    "building": "East Hall",
+    "building_number": 58,
+    "lat": 41.2966, "lng": -82.2203,
+    "cabinets": [
+      {"cabinet_num": "11", "location": "2nd Floor Kitchen", "week": 7}
+    ]
+  },
+  {
+    "building": "Barrows Hall",
+    "building_number": 59,
+    "lat": 41.2958, "lng": -82.2219,
+    "cabinets": [
+      {"cabinet_num": "20", "location": "Kitchen / Common Area", "week": 7}
+    ]
+  },
+  {
+    "building": "Barnard House",
+    "building_number": 60,
+    "lat": 41.2959, "lng": -82.2203,
+    "cabinets": [
+      {"cabinet_num": "12", "location": "Lounge Area", "week": 7}
+    ]
+  },
+  {
+    "building": "Severance Hall",
+    "building_number": 63,
+    "lat": 41.2945, "lng": -82.2203,
+    "cabinets": [
+      {"cabinet_num": "167", "location": "68½ South Professor — Faculty Studio", "week": 7}
+    ]
+  },
+  {
+    "building": "Wright Laboratory of Physics",
+    "building_number": 61,
+    "lat": 41.2953, "lng": -82.2205,
+    "cabinets": [
+      {"cabinet_num": "102", "location": "Physics Lab", "week": 8},
+      {"cabinet_num": "105", "location": "Physics Lab", "week": 8},
+      {"cabinet_num": "106", "location": "Physics Lab", "week": 8},
+      {"cabinet_num": "107", "location": "Physics Lab", "week": 8},
+      {"cabinet_num": "108", "location": "Physics Lab", "week": 8},
+      {"cabinet_num": "106-2", "location": "Woodshop", "week": 8}
+    ]
+  },
+  {
+    "building": "Science Center",
+    "building_number": 62,
+    "lat": 41.2953, "lng": -82.2214,
+    "cabinets": [
+      {"cabinet_num": "52", "location": "Library Office", "week": 8},
+      {"cabinet_num": "53", "location": "Room K118", "week": 8},
+      {"cabinet_num": "54", "location": "2nd Floor Chemistry Lab", "week": 8},
+      {"cabinet_num": "101", "location": "Science Cart-CDS (Wilder FOAP)", "week": 8},
+      {"cabinet_num": "123", "location": "SCTR 261A — Neuroscience Room", "week": 8},
+      {"cabinet_num": "130", "location": "SCTR N287", "week": 8},
+      {"cabinet_num": "131", "location": "SCTR N383", "week": 8},
+      {"cabinet_num": "180", "location": "Room K20", "week": 8},
+      {"cabinet_num": "181", "location": "Room A251", "week": 8},
+      {"cabinet_num": "204", "location": "Room K204", "week": 8}
+    ]
+  },
+  {
+    "building": "Carnegie Building",
+    "building_number": 64,
+    "lat": 41.2948, "lng": -82.2194,
+    "cabinets": [
+      {"cabinet_num": "45", "location": "Word Processing", "week": 9},
+      {"cabinet_num": "46", "location": "Registrar", "week": 9},
+      {"cabinet_num": "47", "location": "Room 125", "week": 9},
+      {"cabinet_num": "308", "location": "Carnegie", "week": 9},
+      {"cabinet_num": "400", "location": "Admissions", "week": 9}
+    ]
+  },
+  {
+    "building": "Stevenson Dining Hall",
+    "building_number": 65,
+    "lat": 41.2958, "lng": -82.2194,
+    "cabinets": [
+      {"cabinet_num": "49", "location": "Griswold Kitchen — Salad Prep", "week": 9},
+      {"cabinet_num": "50", "location": "Biggs Hall", "week": 9},
+      {"cabinet_num": "51", "location": "Upstairs Kitchen", "week": 9},
+      {"cabinet_num": "177", "location": "Small 1st Floor Kitchen", "week": 9}
+    ]
+  },
+  {
+    "building": "Keep Co-op",
+    "building_number": 68,
+    "lat": 41.2955, "lng": -82.2166,
+    "cabinets": [
+      {"cabinet_num": "8", "location": "Kitchen", "week": 9},
+      {"cabinet_num": "95", "location": "Bike Room", "week": 9}
+    ]
+  },
+  {
+    "building": "Asia House",
+    "building_number": 69,
+    "lat": 41.2960, "lng": -82.2195,
+    "cabinets": [
+      {"cabinet_num": "9", "location": "2nd Floor Kitchen", "week": 9},
+      {"cabinet_num": "10", "location": "Basement Kitchen", "week": 9}
+    ]
+  },
+  {
+    "building": "Allen Memorial Art Museum",
+    "building_number": 72,
+    "lat": 41.2936, "lng": -82.2160,
+    "cabinets": [
+      {"cabinet_num": "1", "location": "Museum Addition", "week": 10},
+      {"cabinet_num": "81", "location": "Allen Art Museum #1", "week": 10},
+      {"cabinet_num": "82", "location": "Allen Art Museum #2", "week": 10},
+      {"cabinet_num": "83", "location": "Allen Art Museum #3", "week": 10},
+      {"cabinet_num": "201", "location": "Security Kit", "week": 10}
+    ]
+  },
+  {
+    "building": "Hall Auditorium",
+    "building_number": 74,
+    "lat": 41.2929, "lng": -82.2160,
+    "cabinets": [
+      {"cabinet_num": "84", "location": "Front Desk", "week": 11},
+      {"cabinet_num": "85", "location": "Side Stage", "week": 11},
+      {"cabinet_num": "86", "location": "Backstage 1 (Hall Backstage)", "week": 11},
+      {"cabinet_num": "87", "location": "Backstage 2 (Little Theater)", "week": 11},
+      {"cabinet_num": "122", "location": "Little Theater Control Room", "week": 11},
+      {"cabinet_num": "133", "location": "Back Stage", "week": 11}
+    ]
+  },
+  {
+    "building": "Tank Hall",
+    "building_number": 79,
+    "lat": 41.2921, "lng": -82.2133,
+    "cabinets": [
+      {"cabinet_num": "7", "location": "Kitchen", "week": 11}
+    ]
+  },
+  {
+    "building": "Conservatory of Music",
+    "building_number": 15,
+    "lat": 41.2910, "lng": -82.2194,
+    "cabinets": [
+      {"cabinet_num": "38", "location": "Basement", "week": 12},
+      {"cabinet_num": "39", "location": "Library", "week": 12},
+      {"cabinet_num": "40", "location": "Dock", "week": 12},
+      {"cabinet_num": "41", "location": "Room 123", "week": 12},
+      {"cabinet_num": "170", "location": "CBIB Piano Tech Shop", "week": 12},
+      {"cabinet_num": "175", "location": "CBIB Room 125", "week": 12}
+    ]
+  },
+  {
+    "building": "Adam Joseph Lewis Center (AJLC)",
+    "building_number": null,
+    "lat": 41.2907, "lng": -82.2219,
+    "cabinets": [
+      {"cabinet_num": "5", "location": "Kitchen", "week": null}
+    ]
+  },
+  {
+    "building": "Kahn Hall",
+    "building_number": null,
+    "lat": 41.2964, "lng": -82.2193,
+    "cabinets": [
+      {"cabinet_num": "109", "location": "2nd Floor Kitchen", "week": null},
+      {"cabinet_num": "110", "location": "3rd Floor Kitchen", "week": null},
+      {"cabinet_num": "111", "location": "1st Floor Kitchen", "week": null}
+    ]
+  },
+  {
+    "building": "Woodland Hall",
+    "building_number": null,
+    "lat": 41.2961, "lng": -82.2226,
+    "cabinets": [
+      {"cabinet_num": "unknown", "location": "Kitchen", "week": null},
+      {"cabinet_num": "unknown", "location": "Custodial Room 114 (Trauma Bag)", "week": null}
+    ]
+  }
+]

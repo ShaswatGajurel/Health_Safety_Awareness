@@ -1,0 +1,304 @@
+[
+  {
+    "building": "Johnson House",
+    "building_number": 1,
+    "note": "Residence hall — exact location on campus unknown",
+    "cabinets": [
+      {"cabinet_num": "28", "location": "Kitchen", "week": 1}
+    ]
+  },
+  {
+    "building": "Old Barrows",
+    "building_number": 2,
+    "note": "Separate from Barrows Hall (bldg 59) — exact location unknown",
+    "cabinets": [
+      {"cabinet_num": "29", "location": "Kitchen", "week": 1}
+    ]
+  },
+  {
+    "building": "Allencroft",
+    "building_number": 3,
+    "note": "Small residential building — exact location unknown",
+    "cabinets": [
+      {"cabinet_num": "36", "location": "Allencroft", "week": 1}
+    ]
+  },
+  {
+    "building": "Kade House",
+    "building_number": 4,
+    "note": "Residential building — exact location unknown",
+    "cabinets": [
+      {"cabinet_num": "33", "location": "Kitchen", "week": 1},
+      {"cabinet_num": "34", "location": "Custodial Closet", "week": 1}
+    ]
+  },
+  {
+    "building": "Harvey House",
+    "building_number": 5,
+    "note": "Residential building — exact location unknown",
+    "cabinets": [
+      {"cabinet_num": "35", "location": "Kitchen", "week": 1}
+    ]
+  },
+  {
+    "building": "Price House",
+    "building_number": 8,
+    "note": "Residential building — exact location unknown",
+    "cabinets": [
+      {"cabinet_num": "32", "location": "Kitchen", "week": 1}
+    ]
+  },
+  {
+    "building": "Lord-Saunders",
+    "building_number": 9,
+    "note": "Dining/residential building — exact location unknown",
+    "cabinets": [
+      {"cabinet_num": "31", "location": "Main Kitchen", "week": 1}
+    ]
+  },
+  {
+    "building": "Lewis House",
+    "building_number": 7,
+    "note": "Residential building — exact location unknown",
+    "cabinets": [
+      {"cabinet_num": "37", "location": "Lewis House", "week": 2}
+    ]
+  },
+  {
+    "building": "Fairchild House",
+    "building_number": 13,
+    "note": "Residential co-op — NOT the same as Fairchild Chapel (Bosworth Hall). Exact location unknown.",
+    "cabinets": [
+      {"cabinet_num": "1", "location": "Kitchen / 2nd Floor Kitchen", "week": 2},
+      {"cabinet_num": "2", "location": "Basement Kitchen", "week": 2}
+    ]
+  },
+  {
+    "building": "Service Building / Facilities Operations",
+    "building_number": 39,
+    "note": "Facilities/operations building not mapped. Multiple rooms serviced.",
+    "cabinets": [
+      {"cabinet_num": "56", "location": "Facilities Operations Office", "week": 3},
+      {"cabinet_num": "57", "location": "Stock Room", "week": 3},
+      {"cabinet_num": "58", "location": "Human Resources / Break Room", "week": 3},
+      {"cabinet_num": "59", "location": "Electric", "week": 3},
+      {"cabinet_num": "60", "location": "Carpenter", "week": 3},
+      {"cabinet_num": "61", "location": "Paint", "week": 3},
+      {"cabinet_num": "62", "location": "Print", "week": 3},
+      {"cabinet_num": "63", "location": "Plumber", "week": 3},
+      {"cabinet_num": "64", "location": "HVAC", "week": 3},
+      {"cabinet_num": "65", "location": "Boiler 2nd Floor", "week": 3},
+      {"cabinet_num": "67", "location": "Vehicle Service", "week": 3},
+      {"cabinet_num": "125", "location": "Controller's Room 204", "week": 3},
+      {"cabinet_num": "unknown", "location": "Lounge 1st Floor", "week": 3},
+      {"cabinet_num": "unknown", "location": "New Break Room (installed 5/6/11)", "week": 3}
+    ]
+  },
+  {
+    "building": "Daub Hall",
+    "building_number": 36,
+    "note": "Building not currently mapped — likely near campus center",
+    "cabinets": [
+      {"cabinet_num": "124", "location": "Daub", "week": 5}
+    ]
+  },
+  {
+    "building": "Counseling Center / Professional Services Building",
+    "building_number": 44,
+    "note": "Not currently mapped as a separate building",
+    "cabinets": [
+      {"cabinet_num": "1", "location": "Counseling Center / Prof Bldg", "week": 5},
+      {"cabinet_num": "247", "location": "Counseling Center Suite D", "week": 5}
+    ]
+  },
+  {
+    "building": "Hales Gym / Controller's Space",
+    "building_number": 41,
+    "note": "Listed as building 41 vs Hales (40). Possibly an annex or second Hales structure.",
+    "cabinets": [
+      {"cabinet_num": "1", "location": "Controller's Space / Summer 2010", "week": 6}
+    ]
+  },
+  {
+    "building": "Bailey House",
+    "building_number": 54,
+    "note": "Residential building near Stevenson — not currently mapped",
+    "cabinets": [
+      {"cabinet_num": "22", "location": "1st Floor Kitchen", "week": 7}
+    ]
+  },
+  {
+    "building": "Zechiel House",
+    "building_number": 56,
+    "note": "Residential building — exact location unknown",
+    "cabinets": [
+      {"cabinet_num": "44", "location": "Zechiel", "week": 7}
+    ]
+  },
+  {
+    "building": "Frank Lloyd Wright House",
+    "building_number": "61?",
+    "note": "Possibly the Peter Cooper House (Frank Lloyd Wright design) — off campus or special location",
+    "cabinets": [
+      {"cabinet_num": "1", "location": "Frank Lloyd Wright House", "week": 8}
+    ]
+  },
+  {
+    "building": "Allen Art Building (Studios)",
+    "building_number": 73,
+    "note": "Studio/workshop building adjacent to Allen Art Museum — mapped separately but coordinates uncertain",
+    "cabinets": [
+      {"cabinet_num": "73", "location": "Woodshop 1", "week": 10},
+      {"cabinet_num": "74", "location": "Woodshop 2", "week": 10},
+      {"cabinet_num": "75", "location": "Sculpture", "week": 10},
+      {"cabinet_num": "76", "location": "Photo — 2nd Floor", "week": 10},
+      {"cabinet_num": "77", "location": "Art Library — 2nd Floor", "week": 10},
+      {"cabinet_num": "78", "location": "Silkscreen", "week": 10},
+      {"cabinet_num": "79", "location": "Silkscreen 2", "week": 10},
+      {"cabinet_num": "80", "location": "Art Domes", "week": 10},
+      {"cabinet_num": "169", "location": "Art Department Room 119", "week": 10},
+      {"cabinet_num": "96", "location": "Outside Senior Studios (smaller huts)", "week": 10}
+    ]
+  },
+  {
+    "building": "Firelands Building",
+    "building_number": 80,
+    "note": "Not currently mapped — possibly a satellite campus location",
+    "cabinets": [
+      {"cabinet_num": "6", "location": "Basement Laundry", "week": 11}
+    ]
+  },
+  {
+    "building": "Kohl Building",
+    "building_number": 18,
+    "note": "Not currently mapped as a standalone building",
+    "cabinets": [
+      {"cabinet_num": "307", "location": "Faculty Lounge", "week": 12},
+      {"cabinet_num": "unknown", "location": "Kohl", "week": 12}
+    ]
+  },
+  {
+    "building": "AJLC Annex (132 Elm St.)",
+    "building_number": null,
+    "note": "AJLC Annex at 132 Elm St. — separate from main AJLC, exact location unknown",
+    "cabinets": [
+      {"cabinet_num": "19", "location": "Basement Laundry Room", "week": null}
+    ]
+  },
+  {
+    "building": "Groundshop",
+    "building_number": null,
+    "note": "Groundskeeping / maintenance shop — location unknown",
+    "cabinets": [
+      {"cabinet_num": "21", "location": "Lunchroom", "week": null}
+    ]
+  },
+  {
+    "building": "65 E. College",
+    "building_number": null,
+    "note": "Off-campus or satellite art facility at 65 E. College St.",
+    "cabinets": [
+      {"cabinet_num": "113", "location": "65 E. College", "week": null},
+      {"cabinet_num": "114", "location": "65 E. College — Drawing Studio", "week": null},
+      {"cabinet_num": "165", "location": "65 E. College — Baron Gallery E CS", "week": null}
+    ]
+  },
+  {
+    "building": "ART2 / 75 Addition",
+    "building_number": null,
+    "note": "Art building addition — possibly near Allen Art Building, Room 166",
+    "cabinets": [
+      {"cabinet_num": "118", "location": "ART2, 75 Addition, Room 166", "week": null}
+    ]
+  },
+  {
+    "building": "Orchard Kindergarten",
+    "building_number": null,
+    "note": "Off-campus or satellite location — not mapped",
+    "cabinets": [
+      {"cabinet_num": "128", "location": "Orchard Kindergarten", "week": null}
+    ]
+  },
+  {
+    "building": "Hobbs Art Studio (51 N. Main St.)",
+    "building_number": null,
+    "note": "Off-campus or satellite art studio at 51 N. Main St.",
+    "cabinets": [
+      {"cabinet_num": "132", "location": "Hobbs Art Studio", "week": null}
+    ]
+  },
+  {
+    "building": "137 Elm / 37 Elmwood",
+    "building_number": null,
+    "note": "Address-based location — possibly faculty housing or satellite facility",
+    "cabinets": [
+      {"cabinet_num": "137", "location": "137 Elm or 37 Elmwood", "week": null}
+    ]
+  },
+  {
+    "building": "Faculty Studio",
+    "building_number": null,
+    "note": "Generic label — specific building unknown",
+    "cabinets": [
+      {"cabinet_num": "155", "location": "Faculty Studio", "week": null}
+    ]
+  },
+  {
+    "building": "Venturi Buildings",
+    "building_number": null,
+    "note": "Venturi-designed art/media buildings — exact location unknown",
+    "cabinets": [
+      {"cabinet_num": "162", "location": "Venturi — Book Arts", "week": null},
+      {"cabinet_num": "163", "location": "Venturi — Media Lab", "week": null},
+      {"cabinet_num": "166", "location": "Venturi Room 166", "week": null}
+    ]
+  },
+  {
+    "building": "164 E. Lorain St.",
+    "building_number": null,
+    "note": "Off-campus faculty studio at 164 E. Lorain St.",
+    "cabinets": [
+      {"cabinet_num": "164", "location": "Faculty Studio", "week": null}
+    ]
+  },
+  {
+    "building": "Knowlton Building",
+    "building_number": null,
+    "note": "Not currently mapped — possibly Knowlton Hall near conservatory area",
+    "cabinets": [
+      {"cabinet_num": "178", "location": "Equipment Room", "week": null}
+    ]
+  },
+  {
+    "building": "KITS Electricians",
+    "building_number": null,
+    "note": "Facilities/operations location — specific building unknown",
+    "cabinets": [
+      {"cabinet_num": "unknown", "location": "KITS Electricians", "week": null}
+    ]
+  },
+  {
+    "building": "Nord Performing Arts",
+    "building_number": null,
+    "note": "Nord Hall costume shop — not currently mapped (from additional notes list)",
+    "cabinets": [
+      {"cabinet_num": "unknown", "location": "Costume Shop", "week": null}
+    ]
+  },
+  {
+    "building": "Conservatory Annex (Integrative Arts)",
+    "building_number": null,
+    "note": "Con Annex — integrative arts space, possibly adjacent to main Conservatory but not mapped separately",
+    "cabinets": [
+      {"cabinet_num": "unknown", "location": "1st Floor", "week": null}
+    ]
+  },
+  {
+    "building": "HVAC / Vehicle Fleet",
+    "building_number": null,
+    "note": "6 vehicle kits at HVAC — service vehicle first aid kits, not a fixed building location",
+    "cabinets": [
+      {"cabinet_num": "unknown", "location": "6 Vehicle Kits @ HVAC", "week": null}
+    ]
+  }
+]

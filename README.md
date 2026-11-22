@@ -6,7 +6,7 @@ An interactive map of health and safety resources on the Oberlin College campus.
 
 ## The map
 
-[`Map/map.html`](Map/map.html) is a single self-contained Leaflet page. Layers:
+[`Map/map.html`](Map/map.html) is a Leaflet page. Layers:
 
 - AEDs
 - Menstrual products
@@ -15,7 +15,14 @@ An interactive map of health and safety resources on the Oberlin College campus.
 - Accessible parking
 - Campus buildings
 
-To run it locally, just open `Map/map.html` in a browser.
+The street basemap is a self-hosted OpenStreetMap extract of Oberlin
+([`Map/tiles/oberlin.pmtiles`](Map/tiles/oberlin.pmtiles), drawn with
+[protomaps-leaflet](https://github.com/protomaps/protomaps-leaflet)), so no API key or
+third-party tile server is needed. The satellite view uses Esri World Imagery.
+
+To run it locally, serve the folder with any web server that supports range requests
+(for example `npx http-server`) and open `Map/map.html`. Opening the file directly
+won't load the street basemap.
 
 ### Data caveats
 

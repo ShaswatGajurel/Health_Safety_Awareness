@@ -7,9 +7,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-<script src="https://unpkg.com/protomaps-leaflet@5.1.0/dist/protomaps-leaflet.js"></script>
-<style>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script><style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Playfair+Display:wght@700;800;900&display=swap');
   :root {
     --bg:#f6f4f0;--surface:#ffffff;--surface2:#f0ede8;--border:#ddd8d0;
@@ -759,15 +757,12 @@ window.addEventListener('load', function() {
 
   // ===== TILE LAYERS =====
   var tiles = {
-    // Self-hosted OpenStreetMap basemap: tiles/oberlin.pmtiles is an extract of the
-    // Protomaps OSM build covering Oberlin (bbox -82.26,41.27,-82.18,41.32, z0-15).
-    // No API key or third-party tile server needed.
-    standard: protomapsL.leafletLayer({
-      url:'tiles/oberlin.pmtiles',
-      flavor:'light',
-      lang:'en',
-      maxZoom:19,
-      attribution:'<a href="https://protomaps.com">Protomaps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    // Official OpenStreetMap tiles (same style as openstreetmap.org). No API key;
+    // allowed for light use under https://operations.osmfoundation.org/policies/tiles/
+    // as long as the attribution below stays visible.
+    standard: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+      attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom:19
     }),
     satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
       attribution:'&copy; Esri, Maxar',maxZoom:19
